@@ -35,15 +35,28 @@
     if (!wrap) return;
     const W = wrap.clientWidth, H = wrap.clientHeight;
     const portrait = window.matchMedia && window.matchMedia('(max-aspect-ratio: 1/1)').matches;
-    const k = W + 'x' + H + (portrait ? 'p' : 'l');
+    // keep the content clear of the fixed nav bar (it stays the same pixel size while the layout scales)
+    const navEl = document.querySelector('.tk-start') || document.querySelector('.tk-nav');
+    const navB = navEl ? Math.max(0, Math.round(navEl.getBoundingClientRect().bottom)) : 80;
+    const k = W + 'x' + H + (portrait ? 'p' : 'l') + navB;
     if (!W || !H || stage.dataset.fit === k) return;
     stage.dataset.fit = k; last = '';
+    stage.style.position = portrait ? 'relative' : 'absolute';
     if (portrait) {
+      stage.style.left = stage.style.top = '';
       stage.style.width = W + 'px'; stage.style.height = H + 'px';
       stage.style.setProperty('--u', (W / 1000).toFixed(4) + 'px');
     } else {
-      const u = Math.min(W / 2000, H / 1125);
+      // the visible content occupies design rows 145..980 (835 units); centre that band in the
+      // space between the nav (plus breathing room) and the bottom of the screen
+      const BAND_TOP = 145, BAND_H = 835;
+      const top0 = navB + Math.max(28, H * 0.04), bottomGap = Math.max(36, H * 0.05);
+      const avail = Math.max(200, H - top0 - bottomGap);
+      const u = Math.min(W / 2000, avail / BAND_H);
+      const bandTop = top0 + (avail - BAND_H * u) / 2;
       stage.style.width = (2000 * u).toFixed(2) + 'px'; stage.style.height = (1125 * u).toFixed(2) + 'px';
+      stage.style.left = ((W - 2000 * u) / 2).toFixed(2) + 'px';
+      stage.style.top = (bandTop - BAND_TOP * u).toFixed(2) + 'px';
       stage.style.setProperty('--u', u.toFixed(4) + 'px');
     }
   }
