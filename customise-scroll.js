@@ -12,7 +12,7 @@
   // wheel layout matches the reference: red right, yellow top, green left, blue bottom, magenta bottom-right
   const hueOf = a => { a = ((a % 360) + 360) % 360; return a <= 180 ? a * 2 / 3 : 120 + (a - 180) * 4 / 3; };
 
-  const WHEEL = { cx: 252, cy: 225, R: 163 };
+  const WHEEL = { cx: 300, cy: 280, R: 190 };
   const DOT = { a0: 186, a1: 345 };
 
   let painted = false, last = '';
@@ -68,7 +68,7 @@
     const f = easeOut(seg(enter, 0.25, 1));
     // 3. text bumps up (and slightly right) for the colour step
     const L = portrait ? 0 : easeIO(seg(P, 0.34, 0.47));
-    set($('cz-text'), f, 'translate3d(' + U(22 * L) + ',' + U(-150 * L + (1 - f) * 40) + ',0)');
+    set($('cz-text'), f, 'translate3d(0,' + U(-308 * L + (1 - f) * 40) + ',0)');
     set($('cz-mid'), f, 'translate3d(0,' + U((1 - f) * 60) + ',0) scale(' + (0.97 + 0.03 * f).toFixed(4) + ')');
 
     // copy swaps
@@ -83,7 +83,7 @@
 
     // 2. notifications slide out from behind the feed
     const n = easeIO(seg(P, 0.10, 0.22));
-    // only the part that has slid past the feed's right edge (stage x 1348) is drawn
+    // only the part that has slid past the feed's right edge (stage x 1374) is drawn
     const nEl = $('cz-notif'), nOff = 560 * (1 - n);
     set(nEl, n > 0 ? 1 : 0, 'translate3d(' + U(-nOff) + ',0,0)');
     if (nEl) nEl.style.clipPath = 'inset(0 0 0 ' + U(Math.max(0, nOff - 15)) + ' round ' + U(22) + ')';
@@ -91,10 +91,11 @@
     set($('cz-notif-row'), easeOut(nr), 'translate3d(0,' + U((1 - easeOut(nr)) * 14) + ',0) scale(' + (0.95 + 0.05 * easeBack(nr)).toFixed(4) + ')');
 
     // 3. colour wheel rises, messages drop from behind notifications, then its message pops in
-    const w = easeOut(seg(P, 0.36, 0.48));
-    set($('cz-wheelblock'), w, 'translate3d(0,' + U((1 - w) * 120) + ',0)');
+    // wheel rises with the text (same distance and easing) so the gap between them never closes
+    const Lw = portrait ? 1 : easeIO(seg(P, 0.34, 0.47));
+    set($('cz-wheelblock'), easeOut(seg(P, 0.36, 0.47)), 'translate3d(0,' + U((1 - Lw) * 308) + ',0)');
     const m = easeIO(seg(P, 0.38, 0.49));
-    // starts fully tucked behind notifications; only the part below its bottom edge (stage y 591) is drawn
+    // starts fully tucked behind notifications; only the part below its bottom edge (stage y 535) is drawn
     const mEl = $('cz-msgs'), mOff = 440 * (1 - m);
     set(mEl, m > 0 ? 1 : 0, 'translate3d(0,' + U(-mOff) + ',0)');
     if (mEl) mEl.style.clipPath = 'inset(' + U(Math.max(0, mOff - 27)) + ' 0 0 0 round ' + U(22) + ')';
