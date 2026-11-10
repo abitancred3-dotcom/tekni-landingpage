@@ -235,13 +235,14 @@
   /* Discussion sequence: composer, post and replies (shown while the row pauses on Discussion) */
   .ds-ui{position:absolute;inset:0;pointer-events:none;z-index:2}
   .ds-compose{position:absolute;inset:0;opacity:0}
-  .ds-input{position:absolute;left:calc(var(--u)*30);top:calc(var(--u)*157);width:calc(var(--u)*408);height:calc(var(--u)*62);box-sizing:border-box;display:flex;align-items:center;padding:0 calc(var(--u)*22);border-radius:calc(var(--u)*14);background:#141416;border:1px solid rgba(255,255,255,0.08);font-size:max(12px,calc(var(--u)*19));color:#f2f2f4;white-space:nowrap;overflow:hidden}
-  .ds-ph{color:#8a8a90}
+  .ds-input{position:absolute;left:calc(var(--u)*30);top:calc(var(--u)*157);width:calc(var(--u)*408);height:calc(var(--u)*62);box-sizing:border-box;display:flex;align-items:center;padding:0 calc(var(--u)*26);border-radius:calc(var(--u)*9);background:#000;border:1px solid rgba(255,255,255,0.13);font-size:max(12px,calc(var(--u)*20));color:#f2f2f4;white-space:nowrap;overflow:hidden}
+  .ds-ph{color:#a3a3a6}
   .ds-caret{display:inline-block;width:2px;height:1.15em;margin-left:2px;background:#f2f2f4;opacity:0;animation:dsBlink 1s steps(1) infinite}
   @keyframes dsBlink{50%{visibility:hidden}}
-  .ds-tabs{position:absolute;left:calc(var(--u)*30);top:calc(var(--u)*231);width:calc(var(--u)*408);height:calc(var(--u)*46);display:flex;align-items:center;justify-content:space-between;font-size:max(11px,calc(var(--u)*15));color:#f2f2f4}
-  .ds-tab{display:flex;align-items:center;height:calc(var(--u)*38);padding:0 calc(var(--u)*14);border-radius:calc(var(--u)*10)}
-  .ds-tab[data-on="1"]{background:#e396b3;color:#111}
+  .ds-tabs{position:absolute;left:calc(var(--u)*30);top:calc(var(--u)*231);width:calc(var(--u)*408);height:calc(var(--u)*47);box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 calc(var(--u)*16) 0 calc(var(--u)*7);border-radius:calc(var(--u)*9);background:#000;border:1px solid rgba(255,255,255,0.13);font-size:max(11px,calc(var(--u)*15));color:#f2f2f4}
+  .ds-tab{display:flex;align-items:center;height:calc(var(--u)*33);padding:0 calc(var(--u)*14);border-radius:calc(var(--u)*8)}
+  .ds-tab[data-on="1"]{padding:0 calc(var(--u)*15)}
+  .ds-tab[data-on="1"]{background:#d49cb1;color:#111}
   .ds-create-wrap{position:absolute;left:calc(var(--u)*320);top:calc(var(--u)*393);width:calc(var(--u)*130);height:calc(var(--u)*67);border-radius:calc(var(--u)*16);background:#111;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center}
   .ds-create{width:calc(var(--u)*106);height:calc(var(--u)*46);border-radius:calc(var(--u)*11);background:#e396b3;color:#111;font-size:max(11px,calc(var(--u)*17));font-weight:500;display:flex;align-items:center;justify-content:center;will-change:transform}
   .ds-side{position:absolute;left:calc(var(--u)*469);top:calc(var(--u)*43);width:calc(var(--u)*484);height:calc(var(--u)*500);transform-origin:100% 0}
@@ -277,9 +278,9 @@
     .dv-card{width:calc(var(--u)*660)}
     .dv-label{font-size:calc(var(--u)*30)}
     .dv-cap{font-size:calc(var(--u)*32);max-width:calc(var(--u)*560)}
-    .ds-input{left:calc(var(--u)*30);top:calc(var(--u)*120);width:calc(var(--u)*820);height:calc(var(--u)*96);font-size:calc(var(--u)*34);padding:0 calc(var(--u)*30)}
-    .ds-tabs{left:calc(var(--u)*30);top:calc(var(--u)*232);width:calc(var(--u)*820);height:calc(var(--u)*70);font-size:calc(var(--u)*28)}
-    .ds-tab{height:calc(var(--u)*60);padding:0 calc(var(--u)*20);border-radius:calc(var(--u)*14)}
+    .ds-input{left:calc(var(--u)*30);top:calc(var(--u)*120);width:calc(var(--u)*820);height:calc(var(--u)*96);font-size:calc(var(--u)*34);padding:0 calc(var(--u)*46);border-radius:calc(var(--u)*16)}
+    .ds-tabs{left:calc(var(--u)*30);top:calc(var(--u)*232);width:calc(var(--u)*820);height:calc(var(--u)*84);font-size:calc(var(--u)*28);padding:0 calc(var(--u)*28) 0 calc(var(--u)*12);border-radius:calc(var(--u)*16)}
+    .ds-tab,.ds-tab[data-on="1"]{height:calc(var(--u)*60);padding:0 calc(var(--u)*22);border-radius:calc(var(--u)*14)}
     .ds-create-wrap{left:calc(var(--u)*630);top:calc(var(--u)*330);width:calc(var(--u)*220);height:calc(var(--u)*104)}
     .ds-create{width:calc(var(--u)*180);height:calc(var(--u)*72);font-size:calc(var(--u)*30)}
     .ds-side{left:calc(var(--u)*30);top:calc(var(--u)*110);transform:scale(1.69);transform-origin:0 0}
