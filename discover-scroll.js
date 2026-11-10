@@ -45,8 +45,12 @@
   const HOLD = 0.2;   // fully open while within this distance of the card's own position
   const RAMP = 0.34;  // then eases closed over this distance (overlaps the next card opening)
   const sine = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
-  const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD);
-  const pOf = (sv, n) => P_START + ((sv + LEAD) / (n - 1 + 2 * LEAD)) * (P_END - P_START);
+  // The row pauses on the Moodboard card (index MB) for MB_LEN cards' worth of scrolling while its own
+  // sequence plays. "raw" is the scroll position including that pause; s is the row position.
+  const MB = 2, MB_LEN = 1.5;
+  const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD + MB_LEN);
+  const sFromRaw = raw => raw <= MB ? raw : raw < MB + MB_LEN ? MB : raw - MB_LEN;
+  const pOf = (i, n) => P_START + (((i <= MB ? i : i + MB_LEN) + LEAD) / (n - 1 + 2 * LEAD + MB_LEN)) * (P_END - P_START);
 
   // Chips are quick keys: glide the page to the point where that card is fully popped out.
   let tween = 0;
@@ -193,6 +197,38 @@
     if (!dotsStill) kickDots(); // keep pulsing while hovering
   }
 
+  // ---------- Moodboard sequence (plays while the row pauses on the open Moodboard card) ----------
+  const easeBack = t => { const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+  const NOTES = [ // [selector, in-start, in-end, out-start, out-end, resting tilt]
+    ['.dv-n-blue',  0.15, 0.23, 0.42, 0.50, -3],
+    ['.dv-n-green', 0.26, 0.34, 0.42, 0.50, 3],
+    ['.dv-n-pink',  0.53, 0.61, 0.86, 0.94, -3],
+    ['.dv-n-lilac', 0.64, 0.72, 0.86, 0.94, 3],
+  ];
+  function moodScene(mp, mood) {
+    if (!mood) return;
+    const ui = smooth(seg(mp, 0.02, 0.12)) * (1 - smooth(seg(mp, 0.86, 0.96)));
+    const cap = mood.querySelector('.dv-cap');
+    if (cap) cap.style.opacity = clamp(1 - smooth(seg(mp, 0, 0.08)) + smooth(seg(mp, 0.9, 1)), 0, 1).toFixed(3);
+    const segEl = mood.querySelector('.dv-mb-seg'), tools = mood.querySelector('.dv-mb-tools');
+    if (segEl) { segEl.style.opacity = ui.toFixed(3); segEl.style.transform = 'translate3d(0,' + U((1 - ui) * -14) + ',0)'; }
+    if (tools) { tools.style.opacity = ui.toFixed(3); tools.style.transform = 'translate3d(0,' + U((1 - ui) * 22) + ',0)'; }
+    // the slider sits on Personal, then glides to Collab as the lilac note arrives
+    const toCollab = smooth(seg(mp, 0.64, 0.72));
+    const pill = mood.querySelector('.dv-mb-pill');
+    if (pill) pill.style.transform = 'translate3d(' + U(toCollab * 146) + ',0,0)';
+    mood.querySelectorAll('.dv-mb-opt').forEach((o, i) => { o.dataset.on = (i === 0 ? toCollab < 0.5 : i === 1 ? toCollab >= 0.5 : false) ? '1' : '0'; });
+    NOTES.forEach(([sel, a, b, c, d, tilt]) => {
+      const el = mood.querySelector(sel);
+      if (!el) return;
+      const e = seg(mp, a, b), o = smooth(seg(mp, c, d));
+      const op = smooth(e) * (1 - o);
+      el.style.opacity = op.toFixed(3);
+      el.style.visibility = op > 0.001 ? 'visible' : 'hidden';
+      el.style.transform = 'translate3d(0,' + U((1 - smooth(e)) * 18 - o * 10) + ',0) rotate(' + (tilt - (1 - smooth(e)) * 5).toFixed(2) + 'deg) scale(' + (0.86 + 0.14 * easeBack(e)).toFixed(4) + ')';
+    });
+  }
+
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
     requestAnimationFrame(frame);
@@ -230,7 +266,7 @@
     // the next card starts opening as the previous one closes, so the motion never stops dead.
     const portrait = window.matchMedia && window.matchMedia('(max-aspect-ratio: 1/1)').matches;
     const BASE = portrait ? 660 : 560, EXTRA = portrait ? 220 : 420, GAP = 24, VIEW_W = portrait ? 880 : 1176;
-    const sv = sShown;
+    const sv = sFromRaw(sShown);
     const widths = [], lefts = [];
     let x0 = 0;
     for (let i = 0; i < N; i++) {
@@ -259,6 +295,7 @@
     if (fade) fade.style.opacity = Math.min(1, edge / 40).toFixed(3);
 
     dragScene(sv, lefts, cards, track);
+    moodScene(seg(sShown, MB, MB + MB_LEN), cards[MB]);
 
     // light up the chip for the card currently at the front
     const active = Math.round(sc);
