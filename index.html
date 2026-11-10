@@ -189,6 +189,14 @@
   .dv-ico{display:flex;align-items:center;justify-content:center;width:calc(var(--u)*50);height:calc(var(--u)*50);border-radius:calc(var(--u)*7);background:#111;border:1px solid rgba(255,255,255,0.1)}
   .dv-ico svg{width:calc(var(--u)*22);height:calc(var(--u)*22);display:block}
   .dv-label{display:flex;align-items:center;height:calc(var(--u)*50);padding:0 calc(var(--u)*34);border-radius:calc(var(--u)*7);background:#111;border:1px solid rgba(255,255,255,0.1);color:#f2f2f4;font-size:max(13px,calc(var(--u)*24))}
+  .dv-body{position:absolute;inset:0;pointer-events:none}
+  .dv-tile{position:absolute;border-radius:calc(var(--u)*10);background:#bdbdbd;box-shadow:0 calc(var(--u)*10) calc(var(--u)*30) rgba(0,0,0,0.45)}
+  .dv-insp-a{left:calc(var(--u)*45);top:calc(var(--u)*197);width:calc(var(--u)*232);height:calc(var(--u)*250);transform:rotate(7deg)}
+  .dv-insp-b{left:calc(var(--u)*290);top:calc(var(--u)*119);width:calc(var(--u)*219);height:calc(var(--u)*242);transform:rotate(-4deg)}
+  .dv-mood-frame{position:absolute;left:calc(var(--u)*108);top:calc(var(--u)*139);width:calc(var(--u)*321);padding:calc(var(--u)*15) calc(var(--u)*16) calc(var(--u)*14);border-radius:calc(var(--u)*10);border:1px solid rgba(255,255,255,0.13);background:#000}
+  .dv-mood-img{height:calc(var(--u)*200);border-radius:calc(var(--u)*8);background:#bdbdbd}
+  .dv-mood-label{margin-top:calc(var(--u)*6);font-size:max(12px,calc(var(--u)*22));font-weight:300;color:#e4e4e6;line-height:1.2}
+  .dv-cap{z-index:1}
   .dv-cap{position:absolute;left:calc(var(--u)*32);bottom:calc(var(--u)*34);max-width:calc(var(--u)*440);margin:0;font-size:max(13px,calc(var(--u)*23));font-weight:300;line-height:1.35;color:#e4e4e6}
   @media (max-aspect-ratio:1/1){
     .dv-stage{width:100vw;height:100vh;--u:calc(100vw / 1000)}
@@ -320,12 +328,14 @@
             <p class="dv-cap">A space for the creative community to connect, exchange ideas and ask questions.</p>
           </article>
           <article class="dv-card" aria-label="Inspiration">
-            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M12 2c.5 4.8 2.7 7.6 10 10-7.3 2.4-9.5 5.2-10 10-.5-4.8-2.7-7.6-10-10 7.3-2.4 9.5-5.2 10-10z"></path></svg></span><span class="dv-label">Inspiration</span></div>
-            <p class="dv-cap">Explore work from creatives across every discipline and save whatever sparks an idea.</p>
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f2f2f4"></circle><path d="M6.2 6.2 17.8 17.8M17.8 6.2 6.2 17.8" stroke="#111" stroke-width="2.6" stroke-linecap="round"></path></svg></span><span class="dv-label">Inspiration</span></div>
+            <div class="dv-body" aria-hidden="true"><div class="dv-tile dv-insp-a"></div><div class="dv-tile dv-insp-b"></div></div>
+            <p class="dv-cap">Explore what others are working on, browse finished projects and find new ideas, styles and perspectives to spark your own creativity.</p>
           </article>
           <article class="dv-card" aria-label="Moodboard">
-            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><rect x="3" y="3" width="8" height="10" rx="1.6"></rect><rect x="13" y="3" width="8" height="6" rx="1.6"></rect><rect x="13" y="11" width="8" height="10" rx="1.6"></rect><rect x="3" y="15" width="8" height="6" rx="1.6"></rect></svg></span><span class="dv-label">Moodboard</span></div>
-            <p class="dv-cap">Collect references, images and ideas on a board, and build it together with friends.</p>
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4" aria-hidden="true"><circle cx="12" cy="6.5" r="4.2"></circle><circle cx="17.3" cy="10.4" r="4.2"></circle><circle cx="15.3" cy="16.6" r="4.2"></circle><circle cx="8.7" cy="16.6" r="4.2"></circle><circle cx="6.7" cy="10.4" r="4.2"></circle><circle cx="12" cy="12" r="4"></circle></svg></span><span class="dv-label">Moodboard</span></div>
+            <div class="dv-body" aria-hidden="true"><div class="dv-mood-frame"><div class="dv-mood-img"></div><div class="dv-mood-label">Image xxxx</div></div></div>
+            <p class="dv-cap">Bring your ideas together and build visual collections of inspiration.</p>
           </article>
           <article class="dv-card" aria-label="Collaboration">
             <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><circle cx="9" cy="8" r="3.6"></circle><circle cx="17" cy="9" r="2.8"></circle><path d="M2 20a7 7 0 0 1 14 0z"></path><path d="M15.5 20a8.5 8.5 0 0 0-2.2-5.6A5.5 5.5 0 0 1 22.5 20z"></path></svg></span><span class="dv-label">Collaboration</span></div>
