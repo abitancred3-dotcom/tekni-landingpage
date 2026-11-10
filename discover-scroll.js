@@ -127,9 +127,7 @@
       ghost.style.boxShadow = '0 ' + U(8 + 28 * lift) + ' ' + U(24 + 46 * lift) + ' rgba(0,0,0,' + (0.3 + 0.4 * lift).toFixed(3) + ')';
       const img = ghost.firstElementChild, meta = ghost.lastElementChild;
       if (img) { img.style.height = U(imgH); img.style.borderRadius = U(lerp(10, 8, m)); }
-      if (meta) { meta.style.opacity = smooth(seg(m, 0.5, 1)).toFixed(3); meta.style.height = U(m * (34 + 26 * (1 - smooth(settle)))); }
-      const hint = ghost.querySelector('.dv-ghost-hint');
-      if (hint) hint.style.opacity = (1 - smooth(settle)).toFixed(3);
+      if (meta) { meta.style.opacity = smooth(seg(m, 0.5, 1)).toFixed(3); meta.style.height = U(m * 34); }
     }
 
     // white hand cursor with a small profile badge: glides onto the tile, grabs, carries it, lets go, drifts off
