@@ -298,12 +298,11 @@
     const narrow = matchMedia('(max-aspect-ratio:1/1)').matches;
     const q = sel => card.querySelector(sel), qa = sel => card.querySelectorAll(sel);
     // expanded state: Animation joins the flow, Add stage goes, the workspace appears on the right
-    // "+ Add stage" turns into a name field, "Animation" is typed, then it locks in as a stage and a new Add stage appears below
+    // "+ Add stage" turns into a name field, "Animation" is typed, then it locks in as a stage
     const inp = smooth(seg(cp, 0.0, 0.04)), commit = smooth(seg(cp, 0.17, 0.21));
     const name = 'Animation', nT = Math.round(seg(cp, 0.05, 0.15) * name.length);
     qa('.cb-anim').forEach(el => { el.style.opacity = (exp * commit).toFixed(3); });
     const add = q('.cb-add:not(.cb-add2)'); if (add) add.style.opacity = (1 - exp * inp).toFixed(3);
-    const add2 = q('.cb-add2'); if (add2) { const k = exp * smooth(seg(cp, 0.19, 0.24)); add2.style.opacity = k.toFixed(3); add2.style.transform = 'translate3d(0,' + U((1 - k) * -12) + ',0)'; }
     const nw = q('.cb-new'); if (nw) nw.style.opacity = (exp * inp * (1 - commit)).toFixed(3);
     const nt = q('.cb-new-t'); if (nt && nt.textContent !== name.slice(0, nT)) nt.textContent = name.slice(0, nT);
     const nph = q('.cb-new-ph'); if (nph) nph.style.display = nT > 0 ? 'none' : '';
