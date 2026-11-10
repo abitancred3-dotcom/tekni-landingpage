@@ -45,12 +45,16 @@
   const HOLD = 0.2;   // fully open while within this distance of the card's own position
   const RAMP = 0.34;  // then eases closed over this distance (overlaps the next card opening)
   const sine = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
-  // The row pauses on the Moodboard card (index MB) for MB_LEN cards' worth of scrolling while its own
-  // sequence plays. "raw" is the scroll position including that pause; s is the row position.
-  const MB = 2, MB_LEN = 1.5;
-  const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD + MB_LEN);
-  const sFromRaw = raw => raw <= MB ? raw : raw < MB + MB_LEN ? MB : raw - MB_LEN;
-  const pOf = (i, n) => P_START + (((i <= MB ? i : i + MB_LEN) + LEAD) / (n - 1 + 2 * LEAD + MB_LEN)) * (P_END - P_START);
+  // The row pauses on some cards while their own sequence plays: [card index, length in cards of scrolling].
+  // "raw" is the scroll position including the pauses; s is where the row actually is.
+  const DS = 0, MB = 2;
+  const PAUSES = [[DS, 1.6], [MB, 1.5]];
+  const PAUSE_TOTAL = PAUSES.reduce((a, p) => a + p[1], 0);
+  const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD + PAUSE_TOTAL);
+  const sFromRaw = raw => { let off = 0; for (const [at, len] of PAUSES) { if (raw <= at + off) return raw - off; if (raw < at + off + len) return at; off += len; } return raw - off; };
+  const rawOf = i => { let off = 0; for (const [at, len] of PAUSES) if (at < i) off += len; return i + off; };   // start of card i's pause
+  const pauseProg = (raw, idx) => { const st = rawOf(idx), len = (PAUSES.find(p => p[0] === idx) || [0, 1])[1]; return seg(raw, st, st + len); };
+  const pOf = (i, n) => P_START + ((rawOf(i) + LEAD) / (n - 1 + 2 * LEAD + PAUSE_TOTAL)) * (P_END - P_START);
 
   // Chips are quick keys: glide the page to the point where that card is fully popped out.
   let tween = 0;
@@ -238,6 +242,53 @@
     });
   }
 
+  // ---------- Discussion sequence (plays while the row pauses on the open Discussion card) ----------
+  const POST_TEXT = 'What’s your thoughts on Tekni?';
+  const REPLIES = [0.56, 0.63, 0.70, 0.77];          // each reply bubble pops in at these points
+  const pop = (el, e) => {
+    if (!el) return;
+    el.style.opacity = smooth(e).toFixed(3);
+    el.style.visibility = e > 0.001 ? 'visible' : 'hidden';
+    el.style.transform = 'translate3d(0,' + U((1 - smooth(e)) * 16) + ',0) scale(' + (0.88 + 0.12 * easeBack(e)).toFixed(4) + ')';
+  };
+  const setCount = (el, n) => { if (el && el.textContent !== String(n)) { el.textContent = String(n); el.animate && el.animate([{ transform: 'scale(1.35)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' }); } };
+  function discScene(dp, card) {
+    if (!card) return;
+    // composer (input, topic tabs, Create) eases in as the card opens
+    const open = parseFloat(card.style.getPropertyValue('--dv-open')) || 0;
+    const comp = card.querySelector('.ds-compose');
+    // on phones the post takes the composer's place, and the caption steps aside until the card closes
+    const narrow = matchMedia('(max-aspect-ratio:1/1)').matches;
+    const away = narrow ? smooth(seg(dp, 0.44, 0.5)) : 0;
+    const dcap = card.querySelector('.dv-cap');
+    if (dcap) dcap.style.opacity = narrow ? (1 - away * smooth(seg(open, 0.7, 1))).toFixed(3) : '';
+    if (comp) { comp.style.opacity = (smooth(seg(open, 0.4, 1)) * (1 - away)).toFixed(3); comp.style.transform = 'translate3d(0,' + U((1 - smooth(seg(open, 0.4, 1))) * 14) + ',0)'; }
+    const side = card.querySelector('.ds-side');
+    if (side) side.style.opacity = smooth(seg(open, 0.7, 1)).toFixed(3);
+    // 1. type the question out
+    const typed = card.querySelector('.ds-typed'), ph = card.querySelector('.ds-ph'), caret = card.querySelector('.ds-caret');
+    const tp = seg(dp, 0.06, 0.36);
+    const posted = dp >= 0.45;
+    const n = posted ? 0 : Math.round(tp * POST_TEXT.length);
+    if (typed && typed.textContent !== POST_TEXT.slice(0, n)) typed.textContent = POST_TEXT.slice(0, n);
+    if (ph) ph.style.display = n > 0 || (dp > 0.04 && !posted) ? 'none' : '';
+    if (caret) caret.style.opacity = dp > 0.04 && !posted ? '1' : '0';
+    // 2. Create gets clicked: presses in and goes darker, then releases
+    const btn = card.querySelector('.ds-create');
+    if (btn) {
+      const press = seg(dp, 0.38, 0.45);
+      const down = Math.sin(Math.PI * press);
+      btn.style.transform = 'scale(' + (1 - 0.07 * down).toFixed(4) + ')';
+      btn.style.background = down > 0.02 ? 'color-mix(in srgb, #e396b3, #5a2a3c ' + Math.round(down * 38) + '%)' : '';
+    }
+    // 3. the post appears, then replies pop in one by one while the counts climb
+    pop(card.querySelector('.ds-post'), seg(dp, 0.46, 0.54));
+    card.querySelectorAll('.ds-reply').forEach((r, i) => pop(r, seg(dp, REPLIES[i], REPLIES[i] + 0.06)));
+    setCount(card.querySelector('.ds-likes'), Math.floor(8 * seg(dp, 0.56, 0.9) + 1e-6));
+    setCount(card.querySelector('.ds-comments'), (dp >= 0.66 ? 1 : 0) + (dp >= 0.8 ? 1 : 0));
+    setCount(card.querySelector('.ds-shares'), dp >= 0.86 ? 1 : 0);
+  }
+
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
     requestAnimationFrame(frame);
@@ -304,7 +355,8 @@
     if (fade) fade.style.opacity = Math.min(1, edge / 40).toFixed(3);
 
     dragScene(sv, lefts, cards, track);
-    moodScene(seg(sShown, MB, MB + MB_LEN), cards[MB]);
+    discScene(pauseProg(sShown, DS), cards[DS]);
+    moodScene(pauseProg(sShown, MB), cards[MB]);
 
     // light up the chip for the card currently at the front
     const active = Math.round(sc);
