@@ -132,8 +132,19 @@
       if (hint) hint.style.opacity = (1 - smooth(settle)).toFixed(3);
     }
 
-    // no visible cursor: an invisible grab point (where a hand would hold the card) steers the board's pulse
-    const cx = gx + GRAB.x, cy = gy + GRAB.y;
+    // white hand cursor with a small profile badge: glides onto the tile, grabs, carries it, lets go, drifts off
+    const cIn = smooth(seg(sv, T_IN, T_PRESS)), cOut = smooth(seg(sv, T_SETTLE - 0.02, T_SETTLE + 0.04));
+    let cx, cy;
+    if (!picked) { cx = lerp(sx + SRC.w * 0.95, sx + GRAB.x, cIn); cy = lerp(sy + SRC.h * 0.9, sy + GRAB.y, cIn); }
+    else { cx = gx + GRAB.x + 34 * cOut; cy = gy + GRAB.y + 26 * cOut; }
+    const cursor = document.getElementById('dv-cursor');
+    if (cursor) {
+      const show = cIn * (1 - cOut);
+      cursor.style.display = show > 0.001 ? 'block' : 'none';
+      cursor.style.opacity = show.toFixed(3);
+      const squeeze = sv >= T_PRESS && sv < T_LIFT ? 1 - 0.1 * Math.sin(Math.PI * press) : 1;
+      cursor.style.transform = 'translate3d(' + U(cx) + ',' + U(cy) + ',0) scale(' + squeeze.toFixed(3) + ')';
+    }
 
     // board reacts while the card hovers over it, then calms once it's dropped
     const inside = clamp((cx - L2 + 30) / 110, 0, 1) * clamp((L2 + parseFloat(mood.style.width ? mood.getBoundingClientRect().width : 0) / Math.max(0.0001, unitPx()) - cx + 30) / 110, 0, 1);
