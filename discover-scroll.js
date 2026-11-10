@@ -291,6 +291,7 @@
 
   // ---------- Collaboration sequence: Project -> Feedback -> Discussions -> Activity ----------
   const CB_SWITCH = [[0.36, 0.42], [0.55, 0.61], [0.75, 0.81]];   // slider moves to the next tab over these spans
+  const CB_COLS = [[234, 59, 108], [197, 220, 114], [150, 195, 236], [203, 167, 218]];   // Project pink, Feedback green, Discussions blue, Activity lilac
   function collabScene(cp, card) {
     if (!card) return;
     const open = parseFloat(card.style.getPropertyValue('--dv-open')) || 0;
@@ -323,6 +324,8 @@
       const a = tabs[i0], b = tabs[i1];
       const x = a.offsetLeft + (b.offsetLeft - a.offsetLeft) * f, wd = a.offsetWidth + (b.offsetWidth - a.offsetWidth) * f;
       pill.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)'; pill.style.width = wd.toFixed(2) + 'px';
+      const c0 = CB_COLS[i0], c1 = CB_COLS[i1];            // pill colour blends from one tab's colour to the next
+      pill.style.background = 'rgb(' + c0.map((v, k) => Math.round(v + (c1[k] - v) * f)).join(',') + ')';
       const on = Math.round(st); tabs.forEach((t, i) => { const v = i === on ? '1' : '0'; if (t.dataset.on !== v) t.dataset.on = v; });
     }
     // Project: status counts climb
