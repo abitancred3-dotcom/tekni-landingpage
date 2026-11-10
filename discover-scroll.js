@@ -100,7 +100,7 @@
     const N = cards.length;
     if (!N) return;
     const portrait = window.matchMedia && window.matchMedia('(max-aspect-ratio: 1/1)').matches;
-    const BASE = portrait ? 660 : 560, EXTRA = portrait ? 200 : 320, GAP = 24, VIEW_W = portrait ? 880 : 1176;
+    const BASE = portrait ? 660 : 560, EXTRA = portrait ? 220 : 420, GAP = 24, VIEW_W = portrait ? 880 : 1176;
     const T = seg(P, P_START, P_END) * N;
     const k = Math.min(N - 1, Math.floor(T));
     const u = T - k;
