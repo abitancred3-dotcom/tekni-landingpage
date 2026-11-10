@@ -177,6 +177,9 @@
   #dv-chips{display:flex;flex-wrap:wrap;gap:calc(var(--u)*8);margin-top:calc(var(--u)*28);max-width:calc(var(--u)*520)}
   .dv-chip{display:inline-flex;align-items:center;height:max(28px,calc(var(--u)*40));padding:0 max(12px,calc(var(--u)*18));border-radius:calc(var(--u)*7);background:#0b0b0b;border:1px solid rgba(255,255,255,0.12);color:#f2f2f4;font-size:max(12px,calc(var(--u)*18));transition:background 260ms ease,color 260ms ease,border-color 260ms ease}
   .dv-chip[data-on="1"]{background:#fafafa;color:#0a0a0a;border-color:#fafafa}
+  .dv-chip{cursor:pointer;font-family:inherit;line-height:1}
+  .dv-chip[data-on="0"]:hover{background:#1a1a1c;border-color:rgba(255,255,255,0.28)}
+  .dv-chip:focus-visible{outline:2px solid #fff;outline-offset:2px}
   #dv-view{position:absolute;left:calc(var(--u)*742);top:calc(var(--u)*242);width:calc(var(--u)*1176);height:calc(var(--u)*640);clip-path:inset(-40px -100vw -40px 0);opacity:0;will-change:transform,opacity}
   #dv-fade{position:absolute;left:calc(var(--u)*741);top:calc(var(--u)*232);width:calc(var(--u)*90);height:calc(var(--u)*660);background:linear-gradient(to right,#000 10%,rgba(0,0,0,0));pointer-events:none;z-index:1;opacity:0}
   #dv-track{display:flex;gap:calc(var(--u)*24);height:100%;width:max-content;will-change:transform}
@@ -306,7 +309,7 @@
           <div class="cz-pill">Discover</div>
           <h2>Creativity is more than the finished piece.</h2>
           <p>Behind every finished piece is a journey worth sharing. Discover ideas, connect with your creative community, collaborate and share the process along the way.</p>
-          <div id="dv-chips"><span class="dv-chip" data-on="1">Discussion</span><span class="dv-chip" data-on="0">Inspiration</span><span class="dv-chip" data-on="0">Moodboard</span><span class="dv-chip" data-on="0">Collaboration</span><span class="dv-chip" data-on="0">Share</span></div>
+          <div id="dv-chips"><button type="button" class="dv-chip" data-on="1" data-card="0">Discussion</button><button type="button" class="dv-chip" data-on="0" data-card="1">Inspiration</button><button type="button" class="dv-chip" data-on="0" data-card="2">Moodboard</button><button type="button" class="dv-chip" data-on="0" data-card="3">Collaboration</button><button type="button" class="dv-chip" data-on="0" data-card="4">Share</button></div>
         </div>
       </div>
       <div id="dv-fade" aria-hidden="true"></div>

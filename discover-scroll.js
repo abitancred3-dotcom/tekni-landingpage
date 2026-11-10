@@ -39,6 +39,38 @@
     return true;
   }
 
+  // slot timing: each card's share of the scroll = grow, hold, then shrink while the row moves on
+  const GROW_END = 0.18, HOLD_END = 0.68, P_START = 0.03, P_END = 0.97;
+
+  // Chips are quick keys: glide the page to the point where that card is popped out (middle of its hold).
+  let tween = 0;
+  function glideTo(y) {
+    cancelAnimationFrame(tween);
+    const y0 = window.scrollY, dy = y - y0, t0 = performance.now();
+    const dur = Math.min(1400, Math.max(600, Math.abs(dy) * 0.35));
+    const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      window.scrollTo(0, y0 + dy * ease(k));
+      if (k < 1) tween = requestAnimationFrame(step);
+    };
+    tween = requestAnimationFrame(step);
+  }
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest && e.target.closest('#dv-chips .dv-chip');
+    const sec = document.getElementById('discover');
+    if (!chip || !sec) return;
+    e.preventDefault();
+    const n = sec.querySelectorAll('.dv-card').length || 5;
+    const i = Math.max(0, Math.min(n - 1, +chip.dataset.card || 0));
+    const T = i + (GROW_END + HOLD_END) / 2;
+    const P = P_START + (T / n) * (P_END - P_START);
+    const top = sec.getBoundingClientRect().top + window.scrollY;
+    glideTo(Math.round(top + P * Math.max(0, sec.offsetHeight - window.innerHeight)));
+  });
+  // a wheel or touch during the glide hands control straight back to the visitor
+  ['wheel', 'touchstart', 'keydown'].forEach(ev => window.addEventListener(ev, () => cancelAnimationFrame(tween), { passive: true }));
+
   let last = '';
   function frame() {
     requestAnimationFrame(frame);
@@ -69,9 +101,7 @@
     if (!N) return;
     const portrait = window.matchMedia && window.matchMedia('(max-aspect-ratio: 1/1)').matches;
     const BASE = portrait ? 660 : 560, EXTRA = portrait ? 200 : 320, GAP = 24, VIEW_W = portrait ? 880 : 1176;
-    // slot timing within each card's share of the scroll
-    const GROW_END = 0.18, HOLD_END = 0.68;
-    const T = seg(P, 0.03, 0.97) * N;
+    const T = seg(P, P_START, P_END) * N;
     const k = Math.min(N - 1, Math.floor(T));
     const u = T - k;
     const grow = smooth(seg(u, 0, GROW_END));
@@ -105,6 +135,7 @@
     const active = Math.min(N - 1, k + (slide > 0.5 ? 1 : 0));
     document.querySelectorAll('#dv-chips .dv-chip').forEach((c, i) => {
       if (c.dataset.on !== String(i === active ? 1 : 0)) c.dataset.on = i === active ? '1' : '0';
+      if (i === active) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current');
     });
     cards.forEach((c, i) => { c.dataset.on = i === active ? '1' : '0'; });
   }
