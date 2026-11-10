@@ -74,6 +74,124 @@
   // a wheel or touch during the glide hands control straight back to the visitor
   ['wheel', 'touchstart', 'keydown'].forEach(ev => window.addEventListener(ev, () => cancelAnimationFrame(tween), { passive: true }));
 
+
+  // ---------- Inspiration -> Moodboard drag and drop (scroll-driven) ----------
+  // Positions are in design units, measured from the top-left of the track (cards sit at y = 0).
+  const SRC = { x: 290, y: 119, w: 219, h: 242, rot: -4 };     // right-hand Inspiration tile
+  const DST = { x: 172, y: 236, w: 321, rot: 3 };              // where it lands on the Moodboard
+  const FRAME_IMG_H = 200, FRAME_PAD = 15;
+  const GRAB = { x: 46, y: 34 };                               // where the hand holds the dragged card
+  const T_IN = 0.96, T_PRESS = 1.04, T_LIFT = 1.10, T_DROP = 1.86, T_SETTLE = 1.95;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const dots = { hover: 0, cx: 0, cy: 0, active: false };
+  const unitPx = () => { const st = document.querySelector('.dv-stage'); return st ? parseFloat(st.style.getPropertyValue('--u')) || 1 : 1; };
+
+  function dragScene(sv, lefts, cards, track) {
+    const insp = cards[1], mood = cards[2];
+    if (!insp || !mood) return;
+    const ghost = document.getElementById('dv-ghost'), cursor = document.getElementById('dv-cursor');
+    const tileB = insp.querySelector('.dv-insp-b');
+    if (!ghost || !cursor) return;
+    const L1 = lefts[1], L2 = lefts[2];
+
+    const press = seg(sv, T_PRESS, T_LIFT);          // click and lift
+    const drag = sine(seg(sv, T_LIFT, T_DROP));      // carried across
+    const settle = seg(sv, T_SETTLE - 0.09, T_SETTLE); // let go
+    const picked = sv >= T_PRESS;
+
+    // the source tile dips when clicked and stays dimmed while its copy is carried away
+    if (tileB) {
+      const dip = sv < T_PRESS ? 1 : 1 - 0.05 * Math.sin(Math.PI * Math.min(1, press * 1.6));
+      tileB.style.transform = 'rotate(' + SRC.rot + 'deg) scale(' + dip.toFixed(4) + ')';
+      tileB.style.opacity = (1 - 0.6 * smooth(seg(sv, T_PRESS + 0.02, T_LIFT)) * (1 - smooth(seg(sv, T_DROP, T_SETTLE + 0.1)))).toFixed(3);
+    }
+
+    // the dragged card: starts as an exact copy of the tile, morphs into a moodboard card on the way
+    const m = smooth(seg(drag, 0, 0.35));
+    const sx = L1 + SRC.x, sy = SRC.y, ex = L2 + DST.x, ey = DST.y;
+    const gx = lerp(sx, ex, drag), gy = lerp(sy, ey, drag) - 70 * Math.sin(Math.PI * drag);
+    const lift = smooth(press) * (1 - smooth(settle));
+    const w = lerp(SRC.w, DST.w, m), imgH = lerp(SRC.h, FRAME_IMG_H, m), pad = FRAME_PAD * m;
+    const rot = sv < T_DROP ? lerp(SRC.rot, -2, m) : lerp(-2, DST.rot, smooth(settle));
+    ghost.style.display = picked ? 'block' : 'none';
+    if (picked) {
+      ghost.style.width = U(w);
+      ghost.style.padding = U(pad) + ' ' + U(pad) + ' ' + U(pad * 0.9);
+      ghost.style.transform = 'translate3d(' + U(gx) + ',' + U(gy) + ',0) rotate(' + rot.toFixed(2) + 'deg) scale(' + (1 + 0.04 * lift).toFixed(4) + ')';
+      ghost.style.borderColor = 'rgba(255,255,255,' + (0.13 * m).toFixed(3) + ')';
+      ghost.style.background = 'rgba(0,0,0,' + m.toFixed(3) + ')';
+      ghost.style.boxShadow = '0 ' + U(8 + 28 * lift) + ' ' + U(24 + 46 * lift) + ' rgba(0,0,0,' + (0.3 + 0.4 * lift).toFixed(3) + ')';
+      const img = ghost.firstElementChild, meta = ghost.lastElementChild;
+      if (img) { img.style.height = U(imgH); img.style.borderRadius = U(lerp(10, 8, m)); }
+      if (meta) { meta.style.opacity = smooth(seg(m, 0.5, 1)).toFixed(3); meta.style.height = U(m * (34 + 26 * (1 - smooth(settle)))); }
+      const hint = ghost.querySelector('.dv-ghost-hint');
+      if (hint) hint.style.opacity = (1 - smooth(settle)).toFixed(3);
+    }
+
+    // the cursor: glides in, clicks, grabs, carries, lets go, drifts off
+    const cIn = smooth(seg(sv, T_IN, T_PRESS)), cOut = smooth(seg(sv, T_SETTLE, T_SETTLE + 0.08));
+    const showC = cIn * (1 - cOut);
+    cursor.style.opacity = showC.toFixed(3);
+    cursor.style.display = showC > 0.001 ? 'block' : 'none';
+    let cx, cy;
+    if (!picked) { cx = lerp(sx + SRC.w * 0.9, sx + GRAB.x, cIn); cy = lerp(sy + SRC.h * 0.85, sy + GRAB.y, cIn); }
+    else { cx = gx + GRAB.x + 30 * cOut; cy = gy + GRAB.y + 24 * cOut; }
+    const grabbing = picked && sv < T_SETTLE;
+    cursor.dataset.mode = grabbing ? 'grab' : 'point';
+    cursor.style.transform = 'translate3d(' + U(cx) + ',' + U(cy) + ',0) scale(' + (sv >= T_PRESS && sv < T_LIFT ? 0.9 : 1) + ')';
+
+    // board reacts while the card hovers over it, then calms once it's dropped
+    const inside = clamp((cx - L2 + 30) / 110, 0, 1) * clamp((L2 + parseFloat(mood.style.width ? mood.getBoundingClientRect().width : 0) / Math.max(0.0001, unitPx()) - cx + 30) / 110, 0, 1);
+    const over = picked ? smooth(inside) * (1 - smooth(seg(sv, T_DROP, T_SETTLE))) : 0;
+    dots.hover = over; dots.cx = cx - L2; dots.cy = cy;
+    mood.style.borderColor = over > 0.01 ? 'rgba(255,140,190,' + (0.13 + 0.55 * over).toFixed(3) + ')' : '';
+    insp.style.zIndex = picked && sv < T_SETTLE + 0.1 ? '3' : '';
+    kickDots();
+  }
+
+  // dotted moodboard background, with the pulsing magnet effect around the cursor while hovering
+  let dotRaf = 0, dotsStill = false;
+  function kickDots() { if (!dotRaf) dotRaf = requestAnimationFrame(drawDots); }
+  function drawDots(now) {
+    dotRaf = 0;
+    const cv = document.getElementById('dv-dots');
+    if (!cv) return;
+    const stage = document.querySelector('.dv-stage');
+    const u = stage ? parseFloat(stage.style.getPropertyValue('--u')) || 1 : 1;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H) return;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); dotsStill = false; }
+    const hv = dots.hover;
+    if (hv < 0.001 && dotsStill) return;
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, H);
+    const step = 32 * u, r0 = 1.7 * u, R = 300 * u;
+    const px = dots.cx * u, py = dots.cy * u, t = (now || 0) / 1000;
+    if (hv > 0.001) {
+      const gl = g.createRadialGradient(px, py, 0, px, py, R * 1.1);
+      gl.addColorStop(0, 'rgba(255,120,180,' + (0.10 * hv).toFixed(3) + ')');
+      gl.addColorStop(1, 'rgba(255,120,180,0)');
+      g.fillStyle = gl; g.fillRect(0, 0, W, H);
+    }
+    for (let y = step * 0.75; y < H; y += step) {
+      for (let x = step * 0.75; x < W; x += step) {
+        let dx = x - px, dy = y - py, d = Math.hypot(dx, dy);
+        const near = hv > 0.001 ? Math.exp(-(d * d) / (R * R)) * hv : 0;
+        const wave = 0.5 + 0.5 * Math.sin(d / (34 * u) - t * 5.5);
+        const k = Math.min(1, near * (0.75 + 0.6 * wave));
+        const push = k * 7 * u / Math.max(1, d);
+        const rr = r0 * (1 + 1.9 * k);
+        const kc = Math.min(1, k * 1.6);
+        g.fillStyle = kc > 0.02 ? 'rgb(' + Math.round(44 + 211 * kc) + ',' + Math.round(44 + 112 * kc) + ',' + Math.round(46 + 150 * kc) + ')' : '#2c2c2e';
+        g.beginPath(); g.arc(x + dx * push, y + dy * push, rr, 0, Math.PI * 2); g.fill();
+      }
+    }
+    dotsStill = hv < 0.001;
+    if (!dotsStill) kickDots(); // keep pulsing while hovering
+  }
+
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
     requestAnimationFrame(frame);
@@ -138,6 +256,8 @@
     let edge = Infinity;
     for (let i = 0; i < N; i++) edge = Math.min(edge, Math.abs(x - lefts[i]));
     if (fade) fade.style.opacity = Math.min(1, edge / 40).toFixed(3);
+
+    dragScene(sv, lefts, cards, track);
 
     // light up the chip for the card currently at the front
     const active = Math.round(sc);
