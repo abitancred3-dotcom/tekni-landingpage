@@ -60,19 +60,49 @@
     if (text) { text.style.opacity = f.toFixed(3); text.style.transform = 'translate3d(0,' + U((1 - f) * 40) + ',0)'; }
     if (view) { view.style.opacity = f.toFixed(3); view.style.transform = 'translate3d(' + U((1 - f) * 120) + ',0,0)'; }
 
-    // horizontal travel: short hold at each end, eased in between
+    // Each card takes a turn at the front: it widens out, holds (room for more scroll features),
+    // then eases back in while the row slides on to the next card.
     const track = document.getElementById('dv-track');
     if (!track || !view) return;
-    const shift = Math.max(0, track.scrollWidth - view.clientWidth);
-    const t = smooth(seg(P, 0.06, 0.94));
-    track.style.transform = 'translate3d(' + (-shift * t).toFixed(1) + 'px,0,0)';
+    const cards = track.querySelectorAll('.dv-card');
+    const N = cards.length;
+    if (!N) return;
+    const portrait = window.matchMedia && window.matchMedia('(max-aspect-ratio: 1/1)').matches;
+    const BASE = portrait ? 660 : 560, EXTRA = portrait ? 200 : 320, GAP = 24, VIEW_W = portrait ? 880 : 1176;
+    // slot timing within each card's share of the scroll
+    const GROW_END = 0.18, HOLD_END = 0.68;
+    const T = seg(P, 0.03, 0.97) * N;
+    const k = Math.min(N - 1, Math.floor(T));
+    const u = T - k;
+    const grow = smooth(seg(u, 0, GROW_END));
+    const shrink = smooth(seg(u, HOLD_END, 1));
+    const slide = k < N - 1 ? shrink : 0;
+    const open = grow * (1 - shrink);
+    const widths = [], lefts = [];
+    let x0 = 0;
+    for (let i = 0; i < N; i++) {
+      const e = i === k ? open : 0;
+      widths[i] = BASE + EXTRA * e;
+      lefts[i] = x0; x0 += widths[i] + GAP;
+      const c = cards[i];
+      c.style.width = U(widths[i]);
+      // hooks for future in-card scroll features: how open the card is, and progress through its hold
+      c.style.setProperty('--dv-open', e.toFixed(4));
+      c.style.setProperty('--dv-hold', (i === k ? seg(u, GROW_END, HOLD_END) : (i < k ? 1 : 0)).toFixed(4));
+    }
+    const totalW = x0 - GAP;
+    let x = lefts[k] + (k < N - 1 ? slide * (lefts[k + 1] - lefts[k]) : 0);
+    x = Math.min(x, Math.max(0, totalW - VIEW_W));
+    track.style.transform = 'translate3d(' + U(-x) + ',0,0)';
     // soft edge where cards slide behind the text column (off at rest so the first card's border stays crisp)
     const fade = document.getElementById('dv-fade');
-    if (fade) fade.style.opacity = Math.min(1, t * 12).toFixed(3);
+    // only when a card is part-way behind the edge; a card resting at the front stays crisp
+    let edge = Infinity;
+    for (let i = 0; i < N; i++) edge = Math.min(edge, Math.abs(x - lefts[i]));
+    if (fade) fade.style.opacity = Math.min(1, edge / 40).toFixed(3);
 
-    // light up the chip for the card currently leading the row
-    const cards = track.querySelectorAll('.dv-card');
-    const active = Math.round(t * (cards.length - 1));
+    // light up the chip for the card currently at the front
+    const active = Math.min(N - 1, k + (slide > 0.5 ? 1 : 0));
     document.querySelectorAll('#dv-chips .dv-chip').forEach((c, i) => {
       if (c.dataset.on !== String(i === active ? 1 : 0)) c.dataset.on = i === active ? '1' : '0';
     });
