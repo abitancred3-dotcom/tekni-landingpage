@@ -279,7 +279,7 @@
       const press = seg(dp, 0.38, 0.45);
       const down = Math.sin(Math.PI * press);
       btn.style.transform = 'scale(' + (1 - 0.07 * down).toFixed(4) + ')';
-      btn.style.background = down > 0.02 ? 'color-mix(in srgb, #e396b3, #5a2a3c ' + Math.round(down * 38) + '%)' : '';
+      btn.style.background = down > 0.02 ? 'color-mix(in srgb, #d49cb1, #4a2232 ' + Math.round(down * 38) + '%)' : '';
     }
     // 3. the post appears, then replies pop in one by one while the counts climb
     pop(card.querySelector('.ds-post'), seg(dp, 0.46, 0.54));
