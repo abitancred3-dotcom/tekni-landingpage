@@ -47,8 +47,8 @@
   const sine = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
   // The row pauses on some cards while their own sequence plays: [card index, length in cards of scrolling].
   // "raw" is the scroll position including the pauses; s is where the row actually is.
-  const DS = 0, MB = 2;
-  const PAUSES = [[DS, 1.6], [MB, 1.5]];
+  const DS = 0, MB = 2, CB = 3;
+  const PAUSES = [[DS, 1.6], [MB, 1.5], [CB, 2.4]];
   const PAUSE_TOTAL = PAUSES.reduce((a, p) => a + p[1], 0);
   const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD + PAUSE_TOTAL);
   const sFromRaw = raw => { let off = 0; for (const [at, len] of PAUSES) { if (raw <= at + off) return raw - off; if (raw < at + off + len) return at; off += len; } return raw - off; };
@@ -289,6 +289,45 @@
     setCount(card.querySelector('.ds-shares'), dp >= 0.86 ? 1 : 0);
   }
 
+  // ---------- Collaboration sequence: Project -> Feedback -> Discussions -> Activity ----------
+  const CB_SWITCH = [[0.27, 0.33], [0.50, 0.56], [0.72, 0.78]];   // slider moves to the next tab over these spans
+  function collabScene(cp, card) {
+    if (!card) return;
+    const open = parseFloat(card.style.getPropertyValue('--dv-open')) || 0;
+    const exp = smooth(seg(open, 0.6, 1));
+    const narrow = matchMedia('(max-aspect-ratio:1/1)').matches;
+    const q = sel => card.querySelector(sel), qa = sel => card.querySelectorAll(sel);
+    // expanded state: Animation joins the flow, Add stage goes, the workspace appears on the right
+    qa('.cb-anim').forEach(el => { el.style.opacity = exp.toFixed(3); });
+    const add = q('.cb-add'); if (add) add.style.opacity = (1 - exp).toFixed(3);
+    const right = q('.cb-right');
+    if (right) { right.style.opacity = exp.toFixed(3); right.style.translate = '0 ' + U((1 - exp) * 18); }
+    if (narrow) { const fl = 1 - exp; qa('.cb-flow,.cb-stage').forEach(el => { el.style.opacity = fl.toFixed(3); }); }
+    const cap0 = q('.cb-cap0'); if (cap0) cap0.style.opacity = (1 - exp).toFixed(3);
+    // which tab we're on (continuous 0..3)
+    const st = CB_SWITCH.reduce((a, [a0, a1]) => a + smooth(seg(cp, a0, a1)), 0);
+    const w = i => clamp(1 - Math.abs(st - i), 0, 1);
+    qa('.cb-h').forEach((el, i) => { el.style.opacity = (exp * w(i)).toFixed(3); });
+    qa('.cb-cap').forEach((el, i) => { el.style.opacity = (exp * w(i)).toFixed(3); });
+    qa('.cb-pane').forEach((el, i) => { const k = w(i); el.style.opacity = k.toFixed(3); el.style.visibility = k > 0.001 ? 'visible' : 'hidden'; el.style.transform = 'translate3d(' + U((i - st) * 24) + ',0,0)'; });
+    // slider pill glides between tabs
+    const tabs = qa('.cb-tab'), pill = q('.cb-pill');
+    if (pill && tabs.length) {
+      const i0 = Math.floor(st), i1 = Math.min(3, i0 + 1), f = st - i0;
+      const a = tabs[i0], b = tabs[i1];
+      const x = a.offsetLeft + (b.offsetLeft - a.offsetLeft) * f, wd = a.offsetWidth + (b.offsetWidth - a.offsetWidth) * f;
+      pill.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)'; pill.style.width = wd.toFixed(2) + 'px';
+      const on = Math.round(st); tabs.forEach((t, i) => { const v = i === on ? '1' : '0'; if (t.dataset.on !== v) t.dataset.on = v; });
+    }
+    // Project: status counts climb
+    setCount(q('.cb-todo'), 1 + (cp >= 0.08 ? 1 : 0) + (cp >= 0.13 ? 1 : 0));
+    setCount(q('.cb-prog'), 1 + (cp >= 0.17 ? 1 : 0));
+    setCount(q('.cb-rev'), 1 + (cp >= 0.21 ? 1 : 0));
+    // Feedback / Discussions / Activity: messages arrive as you keep scrolling
+    const pops = qa('.cb-pop'), at = [0.37, 0.60, 0.82, 0.88];
+    pops.forEach((el, i) => pop(el, seg(cp, at[i], at[i] + 0.05)));
+  }
+
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
     requestAnimationFrame(frame);
@@ -357,6 +396,7 @@
     dragScene(sv, lefts, cards, track);
     discScene(pauseProg(sShown, DS), cards[DS]);
     moodScene(pauseProg(sShown, MB), cards[MB]);
+    collabScene(pauseProg(sShown, CB), cards[CB]);
 
     // light up the chip for the card currently at the front
     const active = Math.round(sc);
