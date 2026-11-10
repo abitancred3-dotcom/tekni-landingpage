@@ -17,6 +17,7 @@
 <script src="./connect-scroll.js"></script>
 <script src="./build-scroll.js"></script>
 <script src="./customise-scroll.js"></script>
+<script src="./discover-scroll.js"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -165,6 +166,41 @@
   .tk-nav-item:focus-visible{outline:2px solid #fff;outline-offset:2px}
   @media (max-width:760px){.tk-nav{display:none}}
 
+  /* ---------- Discover: horizontal card scroll ---------- */
+  /* --u and the stage size are set by discover-scroll.js (same fit as Customise); these are fallbacks */
+  .dv-stage{position:relative;flex:none;width:min(100vw,177.78vh);height:min(56.25vw,100vh);--u:calc(min(100vw,177.78vh) / 2000)}
+  .dv-stage *{box-sizing:border-box}
+  #dv-text{position:absolute;left:calc(var(--u)*82);top:calc(var(--u)*562);width:calc(var(--u)*560);z-index:2;opacity:0;will-change:transform,opacity}
+  .dv-text-in{transform:translateY(-50%)}
+  #dv-text h2{margin:calc(var(--u)*18) 0 0;font-size:max(28px,calc(var(--u)*44));font-weight:600;line-height:1.15;letter-spacing:-0.01em;color:#fff}
+  #dv-text p{margin:calc(var(--u)*14) 0 0;font-size:max(17px,calc(var(--u)*24));font-weight:300;line-height:1.35;color:#d2d2d4;max-width:max(330px,calc(var(--u)*520))}
+  #dv-chips{display:flex;flex-wrap:wrap;gap:calc(var(--u)*8);margin-top:calc(var(--u)*28);max-width:calc(var(--u)*520)}
+  .dv-chip{display:inline-flex;align-items:center;height:max(28px,calc(var(--u)*40));padding:0 max(12px,calc(var(--u)*18));border-radius:calc(var(--u)*7);background:#0b0b0b;border:1px solid rgba(255,255,255,0.12);color:#f2f2f4;font-size:max(12px,calc(var(--u)*18));transition:background 260ms ease,color 260ms ease,border-color 260ms ease}
+  .dv-chip[data-on="1"]{background:#fafafa;color:#0a0a0a;border-color:#fafafa}
+  #dv-view{position:absolute;left:calc(var(--u)*742);top:calc(var(--u)*242);width:calc(var(--u)*1176);height:calc(var(--u)*640);clip-path:inset(-40px -100vw -40px 0);opacity:0;will-change:transform,opacity}
+  #dv-fade{position:absolute;left:calc(var(--u)*741);top:calc(var(--u)*232);width:calc(var(--u)*90);height:calc(var(--u)*660);background:linear-gradient(to right,#000 10%,rgba(0,0,0,0));pointer-events:none;z-index:1;opacity:0}
+  #dv-track{display:flex;gap:calc(var(--u)*24);height:100%;width:max-content;will-change:transform}
+  .dv-card{position:relative;flex:none;width:calc(var(--u)*560);height:100%;border-radius:calc(var(--u)*24);border:1px solid rgba(255,255,255,0.13);background:#000;transition:border-color 300ms ease}
+  .dv-card[data-on="1"]{border-color:rgba(255,255,255,0.28)}
+  .dv-head{position:absolute;left:calc(var(--u)*30);top:calc(var(--u)*28);display:flex;gap:calc(var(--u)*16);align-items:center}
+  .dv-ico{display:flex;align-items:center;justify-content:center;width:calc(var(--u)*50);height:calc(var(--u)*50);border-radius:calc(var(--u)*7);background:#111;border:1px solid rgba(255,255,255,0.1)}
+  .dv-ico svg{width:calc(var(--u)*22);height:calc(var(--u)*22);display:block}
+  .dv-label{display:flex;align-items:center;height:calc(var(--u)*50);padding:0 calc(var(--u)*34);border-radius:calc(var(--u)*7);background:#111;border:1px solid rgba(255,255,255,0.1);color:#f2f2f4;font-size:max(13px,calc(var(--u)*24))}
+  .dv-cap{position:absolute;left:calc(var(--u)*32);bottom:calc(var(--u)*34);max-width:calc(var(--u)*440);margin:0;font-size:max(13px,calc(var(--u)*23));font-weight:300;line-height:1.35;color:#e4e4e6}
+  @media (max-aspect-ratio:1/1){
+    .dv-stage{width:100vw;height:100vh;--u:calc(100vw / 1000)}
+    #dv-text{left:calc(var(--u)*60);top:calc(var(--u)*230);width:calc(var(--u)*880)}
+    .dv-text-in{transform:none}
+    #dv-text h2{font-size:calc(var(--u)*60)}
+    #dv-text p{font-size:calc(var(--u)*36);max-width:none}
+    #dv-chips{max-width:none}
+    #dv-fade{display:none}
+    #dv-view{left:calc(var(--u)*60);top:auto;bottom:calc(var(--u)*90);width:calc(var(--u)*880);height:min(calc(var(--u)*760),46vh)}
+    .dv-card{width:calc(var(--u)*660)}
+    .dv-label{font-size:calc(var(--u)*30)}
+    .dv-cap{font-size:calc(var(--u)*32);max-width:calc(var(--u)*560)}
+  }
+
   /* ---------- Customise scroll sequence ---------- */
   #customise{--cz-acc:hsl(128 100% 62%);--cz-acc-ink:hsl(128 100% 14%);--cz-acc-soft:hsl(128 90% 80%)}
   /* --u (one design unit, in px) and the stage size are set by customise-scroll.js from the space actually available; these are fallbacks */
@@ -261,6 +297,46 @@
     <a class="tk-start" href="https://www.tekni.app/" target="_blank" rel="noopener">Get Started</a>
   </div>
 </div>
+
+<section id="discover" aria-label="Discover" style="position:relative;height:320vh;background:#000">
+  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
+    <div class="dv-stage">
+      <div id="dv-text">
+        <div class="dv-text-in">
+          <div class="cz-pill">Discover</div>
+          <h2>Creativity is more than the finished piece.</h2>
+          <p>Behind every finished piece is a journey worth sharing. Discover ideas, connect with your creative community, collaborate and share the process along the way.</p>
+          <div id="dv-chips"><span class="dv-chip" data-on="1">Discussion</span><span class="dv-chip" data-on="0">Inspiration</span><span class="dv-chip" data-on="0">Moodboard</span><span class="dv-chip" data-on="0">Collaboration</span><span class="dv-chip" data-on="0">Share</span></div>
+        </div>
+      </div>
+      <div id="dv-fade" aria-hidden="true"></div>
+      <div id="dv-view">
+        <div id="dv-track">
+          <article class="dv-card" aria-label="Discussion">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span class="dv-label">Discussion</span></div>
+            <p class="dv-cap">A space for the creative community to connect, exchange ideas and ask questions.</p>
+          </article>
+          <article class="dv-card" aria-label="Inspiration">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M12 2c.5 4.8 2.7 7.6 10 10-7.3 2.4-9.5 5.2-10 10-.5-4.8-2.7-7.6-10-10 7.3-2.4 9.5-5.2 10-10z"></path></svg></span><span class="dv-label">Inspiration</span></div>
+            <p class="dv-cap">Explore work from creatives across every discipline and save whatever sparks an idea.</p>
+          </article>
+          <article class="dv-card" aria-label="Moodboard">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><rect x="3" y="3" width="8" height="10" rx="1.6"></rect><rect x="13" y="3" width="8" height="6" rx="1.6"></rect><rect x="13" y="11" width="8" height="10" rx="1.6"></rect><rect x="3" y="15" width="8" height="6" rx="1.6"></rect></svg></span><span class="dv-label">Moodboard</span></div>
+            <p class="dv-cap">Collect references, images and ideas on a board, and build it together with friends.</p>
+          </article>
+          <article class="dv-card" aria-label="Collaboration">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><circle cx="9" cy="8" r="3.6"></circle><circle cx="17" cy="9" r="2.8"></circle><path d="M2 20a7 7 0 0 1 14 0z"></path><path d="M15.5 20a8.5 8.5 0 0 0-2.2-5.6A5.5 5.5 0 0 1 22.5 20z"></path></svg></span><span class="dv-label">Collaboration</span></div>
+            <p class="dv-cap">Invite others into your projects and create together, from first sketch to final piece.</p>
+          </article>
+          <article class="dv-card" aria-label="Share">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 256 256" fill="#f2f2f4"><path d="M237.66,106.35l-80-80A8,8,0,0,0,144,32V72.35c-25.94,2.22-54.59,14.92-78.16,34.91-28.38,24.08-46.05,55.11-49.76,87.37a12,12,0,0,0,20.68,9.58h0c11-11.71,50.14-48.74,107.24-52V192a8,8,0,0,0,13.66,5.65l80-80A8,8,0,0,0,237.66,106.35Z"></path></svg></span><span class="dv-label">Share</span></div>
+            <p class="dv-cap">Post your work and the process behind it, from early drafts to the finished piece.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="customise" aria-label="Customise your feed" style="position:relative;height:400vh;background:#000">
   <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
