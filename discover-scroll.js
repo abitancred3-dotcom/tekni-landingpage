@@ -47,8 +47,8 @@
   const sine = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
   // The row pauses on some cards while their own sequence plays: [card index, length in cards of scrolling].
   // "raw" is the scroll position including the pauses; s is where the row actually is.
-  const DS = 0, MB = 2, CB = 3;
-  const PAUSES = [[DS, 1.6], [MB, 1.5], [CB, 3.0]];
+  const DS = 0, MB = 2, CB = 3, SH = 4;
+  const PAUSES = [[DS, 1.6], [MB, 1.5], [CB, 3.0], [SH, 2.4]];
   const PAUSE_TOTAL = PAUSES.reduce((a, p) => a + p[1], 0);
   const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD + PAUSE_TOTAL);
   const sFromRaw = raw => { let off = 0; for (const [at, len] of PAUSES) { if (raw <= at + off) return raw - off; if (raw < at + off + len) return at; off += len; } return raw - off; };
@@ -337,6 +337,57 @@
     pops.forEach((el, i) => pop(el, seg(cp, at[i], at[i] + 0.05)));
   }
 
+  // ---------- Share sequence: icons fan out, Share lights up, Public, portfolio circle, + clicked, moodboard linked ----------
+  const SH_FAN = [[-70, 56, 0.04], [-118, -30, 0.09], [-84, -116, 0.14]];   // each icon slides out from behind the image: [dx, dy, start]
+  function shareScene(sp, card) {
+    if (!card) return;
+    const open = parseFloat(card.style.getPropertyValue('--dv-open')) || 0;
+    const exp = smooth(seg(open, 0.6, 1));
+    const q = sel => card.querySelector(sel), qa = sel => card.querySelectorAll(sel);
+    const gone = smooth(seg(sp, 0.86, 0.92));               // fan icons leave as the moodboard links to the post
+    // Personal / Public switch
+    const sw = q('.sh-seg');
+    if (sw) {
+      sw.style.opacity = exp.toFixed(3);
+      const pub = smooth(seg(sp, 0.34, 0.40)), opts = sw.querySelectorAll('.sh-opt'), pill = q('.sh-pill');
+      if (pill && opts.length > 1) pill.style.transform = 'translate3d(' + (opts[1].offsetLeft - opts[0].offsetLeft) * pub + 'px,0,0)';
+      opts.forEach((o, i) => { const v = (pub >= 0.5) === (i === 1) ? '1' : '0'; if (o.dataset.on !== v) o.dataset.on = v; });
+    }
+    // icons fan out from behind the image
+    qa('.sh-ic').forEach((el, i) => {
+      const [dx, dy, t0] = SH_FAN[i], e = seg(sp, t0, t0 + 0.08), k = smooth(e);
+      let sc = 0.6 + 0.4 * easeBack(e), bg = '';
+      if (i === 1) {                                           // Share gets highlighted and grows
+        const h = smooth(seg(sp, 0.22, 0.30));
+        sc *= 1 + 0.25 * h;
+        if (h > 0.001) bg = 'rgb(' + [[42, 142], [42, 197], [44, 240]].map(([a, b]) => Math.round(a + (b - a) * h)).join(',') + ')';
+      }
+      el.style.opacity = (exp * k * (1 - gone)).toFixed(3);
+      el.style.background = bg;
+      el.style.transform = 'translate3d(' + U(dx * (1 - k)) + ',' + U(dy * (1 - k)) + ',0) scale(' + sc.toFixed(4) + ')';
+    });
+    // portfolio squares appear one by one around a circle
+    qa('.sh-sq').forEach((el, i) => { const t0 = 0.42 + i * 0.036; pop(el, exp * seg(sp, t0, t0 + 0.05)); });
+    // + pops up in the middle, then gets clicked
+    const plus = q('.sh-plus');
+    if (plus) {
+      const e = seg(sp, 0.72, 0.78), press = Math.sin(Math.PI * seg(sp, 0.80, 0.86));
+      const k = exp * smooth(e);
+      plus.style.opacity = k.toFixed(3); plus.style.visibility = k > 0.001 ? 'visible' : 'hidden';
+      plus.style.transform = 'scale(' + ((0.5 + 0.5 * easeBack(e)) * (1 - 0.1 * press)).toFixed(4) + ')';
+      plus.style.background = press > 0.02 ? 'color-mix(in srgb, #8ec5f0, #24506f ' + Math.round(press * 40) + '%)' : '';
+    }
+    // moodboard icon lands on the image
+    const mb = q('.sh-mb');
+    if (mb) { const e = seg(sp, 0.86, 0.93); mb.style.opacity = (exp * smooth(e)).toFixed(3); mb.style.transform = 'scale(' + (0.4 + 0.6 * easeBack(e)).toFixed(4) + ')'; }
+    // captions
+    const c1 = exp * smooth(seg(sp, 0.34, 0.40)) * (1 - gone), c2 = exp * gone;
+    const caps = qa('.sh-cap'), c0 = q('.sh-cap0');
+    if (caps[0]) caps[0].style.opacity = c1.toFixed(3);
+    if (caps[1]) caps[1].style.opacity = c2.toFixed(3);
+    if (c0) c0.style.opacity = (1 - c1 - c2).toFixed(3);
+  }
+
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
     requestAnimationFrame(frame);
@@ -406,6 +457,7 @@
     discScene(pauseProg(sShown, DS), cards[DS]);
     moodScene(pauseProg(sShown, MB), cards[MB]);
     collabScene(pauseProg(sShown, CB), cards[CB]);
+    shareScene(pauseProg(sShown, SH), cards[SH]);
 
     // light up the chip for the card currently at the front
     const active = Math.round(sc);
