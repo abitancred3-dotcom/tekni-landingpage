@@ -17,7 +17,7 @@
 <script src="./connect-scroll.js?v=b033816408"></script>
 <script src="./build-scroll.js?v=881911ca5b"></script>
 <script src="./customise-scroll.js?v=88190ed8fd"></script>
-<script src="./discover-scroll.js?v=5938e6b135"></script>
+<script src="./discover-scroll.js?v=4705bd98e7"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -320,18 +320,18 @@
   .sh-pill{position:absolute;left:calc(var(--u)*5);top:calc(var(--u)*5);width:calc(var(--u)*98);height:calc(var(--u)*38);border-radius:calc(var(--u)*8);background:#e396b3;will-change:transform}
   .sh-opt{position:relative;display:flex;align-items:center;justify-content:center;width:calc(var(--u)*98);height:calc(var(--u)*38);transition:color 200ms}
   .sh-opt[data-on="1"]{color:#111}
-  .sh-frame{position:absolute;left:calc(var(--u)*88);top:calc(var(--u)*122);width:calc(var(--u)*343);box-sizing:border-box;padding:calc(var(--u)*16) calc(var(--u)*18) calc(var(--u)*14);border-radius:calc(var(--u)*8);border:1px solid rgba(255,255,255,0.1);background:#0a0a0b;transform:rotate(-4deg);transform-origin:50% 50%}
+  .sh-frame{position:absolute;z-index:1;left:calc(var(--u)*88);top:calc(var(--u)*122);width:calc(var(--u)*343);box-sizing:border-box;padding:calc(var(--u)*16) calc(var(--u)*18) calc(var(--u)*14);border-radius:calc(var(--u)*8);border:1px solid rgba(255,255,255,0.1);background:#0a0a0b;transform:rotate(-4deg);transform-origin:50% 50%}
   .sh-img{height:calc(var(--u)*214);border-radius:calc(var(--u)*7);background:#bdbdbd}
   .sh-title{margin-top:calc(var(--u)*12);font-size:calc(var(--u)*22);font-weight:300;color:#e4e4e6}
   .sh-mb{position:absolute;right:calc(var(--u)*30);top:calc(var(--u)*28);display:flex;align-items:center;justify-content:center;width:calc(var(--u)*46);height:calc(var(--u)*46);border-radius:calc(var(--u)*10);background:#2a2a2c;opacity:0;will-change:transform,opacity}
   .sh-mb svg{width:calc(var(--u)*26);height:calc(var(--u)*26)}
-  .sh-ic{position:absolute;display:flex;align-items:center;justify-content:center;width:calc(var(--u)*68);height:calc(var(--u)*68);border-radius:calc(var(--u)*14);background:#2a2a2c;opacity:0;will-change:transform,opacity}
+  .sh-ic{position:absolute;display:flex;align-items:center;justify-content:center;width:calc(var(--u)*68);height:calc(var(--u)*68);border-radius:calc(var(--u)*16);background:#1c1c1e;opacity:0;will-change:transform,opacity}
   .sh-ic svg{width:calc(var(--u)*36);height:calc(var(--u)*36)}
-  .sh-ic0{left:calc(var(--u)*458);top:calc(var(--u)*150)}
-  .sh-ic1{left:calc(var(--u)*505);top:calc(var(--u)*236)}
-  .sh-ic2{left:calc(var(--u)*472);top:calc(var(--u)*322)}
+  .sh-ic0{left:calc(var(--u)*470);top:calc(var(--u)*118)}
+  .sh-ic1{left:calc(var(--u)*530);top:calc(var(--u)*236)}
+  .sh-ic2{left:calc(var(--u)*482);top:calc(var(--u)*354)}
   .sh-sq{position:absolute;width:calc(var(--u)*62);height:calc(var(--u)*62);border-radius:calc(var(--u)*14);background:#8a8a8c;opacity:0;visibility:hidden;will-change:transform,opacity}
-  .sh-plus{position:absolute;left:calc(var(--u)*727);top:calc(var(--u)*287);display:flex;align-items:center;justify-content:center;width:calc(var(--u)*86);height:calc(var(--u)*86);border-radius:calc(var(--u)*16);background:#8ec5f0;opacity:0;visibility:hidden;will-change:transform,opacity}
+  .sh-plus{position:absolute;left:calc(var(--u)*747);top:calc(var(--u)*287);display:flex;align-items:center;justify-content:center;width:calc(var(--u)*86);height:calc(var(--u)*86);border-radius:calc(var(--u)*16);background:#8ec5f0;opacity:0;visibility:hidden;will-change:transform,opacity}
   .sh-plus svg{width:calc(var(--u)*48);height:calc(var(--u)*48)}
   .sh-cap{opacity:0}
   .dv-card-share .dv-cap{max-width:calc(var(--u)*470)}
@@ -567,7 +567,7 @@
               <div class="sh-seg"><span class="sh-pill"></span><span class="sh-opt" data-on="1">Personal</span><span class="sh-opt">Public</span></div>
               <div class="sh-frame"><div class="sh-img"></div><div class="sh-title">Image xxxx</div><span class="sh-mb"><svg viewBox="0 0 24 24" fill="#f2f2f4"><circle cx="12" cy="6.5" r="4.2"/><circle cx="17.3" cy="10.4" r="4.2"/><circle cx="15.3" cy="16.6" r="4.2"/><circle cx="8.7" cy="16.6" r="4.2"/><circle cx="6.7" cy="10.4" r="4.2"/><circle cx="12" cy="12" r="4"/></svg></span></div>
               <span class="sh-ic sh-ic0"><svg viewBox="0 0 24 24" fill="#f2f2f4"><circle cx="12" cy="6.5" r="4.2"/><circle cx="17.3" cy="10.4" r="4.2"/><circle cx="15.3" cy="16.6" r="4.2"/><circle cx="8.7" cy="16.6" r="4.2"/><circle cx="6.7" cy="10.4" r="4.2"/><circle cx="12" cy="12" r="4"/></svg></span><span class="sh-ic sh-ic1"><svg viewBox="0 0 256 256" fill="#f2f2f4"><path d="M237.66,106.35l-80-80A8,8,0,0,0,144,32V72.35c-25.94,2.22-54.59,14.92-78.16,34.91-28.38,24.08-46.050,55.11-49.76,87.37a12,12,0,0,0,20.68,9.58h0c11-11.71,50.14-48.74,107.24-52V192a8,8,0,0,0,13.66,5.65l80-80A8,8,0,0,0,237.66,106.35Z"/></svg></span><span class="sh-ic sh-ic2"><svg viewBox="0 0 24 24" fill="#f2f2f4"><rect x="2.5" y="6" width="5" height="12" rx="2.5"/><rect x="9.5" y="3" width="5" height="18" rx="2.5"/><rect x="16.5" y="5" width="5" height="10" rx="2.5"/></svg></span>
-              <span class="sh-sq" style="left:calc(var(--u)*640.0);top:calc(var(--u)*200.0)"></span><span class="sh-sq" style="left:calc(var(--u)*739.0);top:calc(var(--u)*159.0)"></span><span class="sh-sq" style="left:calc(var(--u)*838.0);top:calc(var(--u)*200.0)"></span><span class="sh-sq" style="left:calc(var(--u)*879.0);top:calc(var(--u)*299.0)"></span><span class="sh-sq" style="left:calc(var(--u)*838.0);top:calc(var(--u)*398.0)"></span><span class="sh-sq" style="left:calc(var(--u)*739.0);top:calc(var(--u)*439.0)"></span><span class="sh-sq" style="left:calc(var(--u)*640.0);top:calc(var(--u)*398.0)"></span><span class="sh-sq" style="left:calc(var(--u)*599.0);top:calc(var(--u)*299.0)"></span>
+              <span class="sh-sq" style="left:calc(var(--u)*660.0);top:calc(var(--u)*200.0)"></span><span class="sh-sq" style="left:calc(var(--u)*759.0);top:calc(var(--u)*159.0)"></span><span class="sh-sq" style="left:calc(var(--u)*858.0);top:calc(var(--u)*200.0)"></span><span class="sh-sq" style="left:calc(var(--u)*899.0);top:calc(var(--u)*299.0)"></span><span class="sh-sq" style="left:calc(var(--u)*858.0);top:calc(var(--u)*398.0)"></span><span class="sh-sq" style="left:calc(var(--u)*759.0);top:calc(var(--u)*439.0)"></span><span class="sh-sq" style="left:calc(var(--u)*660.0);top:calc(var(--u)*398.0)"></span><span class="sh-sq" style="left:calc(var(--u)*619.0);top:calc(var(--u)*299.0)"></span>
               <span class="sh-plus"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
             </div>
             <p class="dv-cap sh-cap0">Share your creative process through workspaces, personal moodboards and post updates, bringing together every stage from the first idea to the final result.</p>
