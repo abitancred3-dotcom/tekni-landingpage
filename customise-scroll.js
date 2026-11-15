@@ -171,7 +171,7 @@
     if (!portrait) {
       // content as it sits at the end of the colour step
       box = { x0: 82, x1: 1919, y0: 145, y1: 980 };
-      cx = 1000.5; maxW = 1320; cols = 12; capW = 920;
+      cx = 1000.5; maxW = 1760; cols = 12; capW = 920;
     } else {
       box = { x0: 30, x1: 970, y0: 200, y1: Hs - 50 };
       cx = 500; maxW = 940; cols = 6; capW = 900;
@@ -179,14 +179,13 @@
     cap.style.width = 'calc(var(--u) * ' + capW + ')';
     const capH = cap.offsetHeight / u;
     const PAD = 20, CAPGAP = 22;
-    // the screen box sits vertically centred between the nav and the bottom of the screen,
-    // sized so the caption still fits underneath it
-    const cy = (navB + vBot) / 2;
-    const top0 = navB + 24, bot0 = vBot - 30;
-    const half = Math.min(cy - top0, bot0 - capH - CAPGAP - cy);
+    // the screen box + caption, as one group, is as large as the space allows and
+    // vertically centred between the nav and the bottom of the screen
+    const top0 = navB + 24, bot0 = vBot - 28, avail = bot0 - top0;
     const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
-    const s = Math.max(0.2, Math.min((2 * half - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.85));
-    const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2, fy = cy - fh / 2;
+    const s = Math.max(0.2, Math.min((avail - capH - CAPGAP - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.92));
+    const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
+    const fy = top0 + (avail - (fh + CAPGAP + capH)) / 2;
     const bcx = (box.x0 + box.x1) / 2, bcy = (box.y0 + box.y1) / 2;
     const L = { box, s, PAD, fx, fy, fw, fh, bcx, bcy, dx: fx + fw / 2 - bcx, dy: fy + fh / 2 - bcy };
 
@@ -357,9 +356,13 @@
     menuEl.style.visibility = mo > 0.001 ? 'visible' : 'hidden';
     // the Image row lights up pink, then is pressed
     const rh = easeOut(seg(sv, 446, 456));
-    imgRow.style.background = rh > 0 ? 'color-mix(in srgb, var(--cz-acc) ' + (rh * 100).toFixed(1) + '%, transparent)' : '';
-    const sub = imgRow.querySelectorAll('span span')[1];
-    if (sub) sub.style.color = 'color-mix(in srgb, #fff ' + (rh * 85).toFixed(1) + '%, #a7a7ac)';
+    // only the icon and text turn pink, not the whole row
+    const mix = (c) => 'color-mix(in srgb, var(--cz-acc) ' + (rh * 100).toFixed(1) + '%, ' + c + ')';
+    const [ttl, sub] = imgRow.querySelectorAll('span span');
+    const isvg = imgRow.querySelector('svg');
+    if (isvg) isvg.style.fill = mix('#f2f2f4');
+    if (ttl) ttl.style.color = mix('#f2f2f4');
+    if (sub) sub.style.color = mix('#a7a7ac');
     const press = Math.sin(Math.PI * seg(sv, 456, 462));
     imgRow.style.transform = press > 0 ? 'scale(' + (1 - 0.04 * press).toFixed(4) + ')' : '';
 
