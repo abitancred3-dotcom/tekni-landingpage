@@ -283,14 +283,6 @@
     }
     // 3. the post appears, then replies pop in one by one while the counts climb
     pop(card.querySelector('.ds-post'), seg(dp, 0.46, 0.54));
-    // once the post is up, the intro paragraph on the left swaps to the Discussion copy (height eases between the two)
-    const sw = smooth(seg(dp, 0.46, 0.54)) * (side ? parseFloat(side.style.opacity) || 0 : 0);
-    const pw = document.querySelector('#dv-text .dv-p-wrap');
-    if (pw) {
-      const p0 = pw.querySelector('.dv-p0'), p1 = pw.querySelector('.dv-p1');
-      p0.style.opacity = (1 - sw).toFixed(3); p1.style.opacity = sw.toFixed(3);
-      pw.style.height = (p0.offsetHeight + (p1.offsetHeight - p0.offsetHeight) * sw).toFixed(1) + 'px';
-    }
     card.querySelectorAll('.ds-reply').forEach((r, i) => pop(r, seg(dp, REPLIES[i], REPLIES[i] + 0.06)));
     setCount(card.querySelector('.ds-likes'), Math.floor(8 * seg(dp, 0.56, 0.9) + 1e-6));
     setCount(card.querySelector('.ds-comments'), (dp >= 0.66 ? 1 : 0) + (dp >= 0.8 ? 1 : 0));
@@ -397,6 +389,17 @@
     if (c0) c0.style.opacity = (1 - c1 - c2).toFixed(3);
   }
 
+  // Intro paragraph on the left swaps to the alternate copy once the Discussion post is up, holds through Inspiration,
+  // then eases back before Moodboard. raw = scroll position including pauses.
+  function introSwap(raw) {
+    const pw = document.querySelector('#dv-text .dv-p-wrap'); if (!pw) return;
+    const post = rawOf(DS) + 0.46 * PAUSES[0][1];
+    const sw = smooth(seg(raw, post, post + 0.13)) * (1 - smooth(seg(raw, rawOf(1) + 0.4, rawOf(1) + 0.7)));
+    const p0 = pw.querySelector('.dv-p0'), p1 = pw.querySelector('.dv-p1');
+    p0.style.opacity = (1 - sw).toFixed(3); p1.style.opacity = sw.toFixed(3);
+    pw.style.height = (p0.offsetHeight + (p1.offsetHeight - p0.offsetHeight) * sw).toFixed(1) + 'px';
+  }
+
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
     requestAnimationFrame(frame);
@@ -464,6 +467,7 @@
 
     dragScene(sv, lefts, cards, track);
     discScene(pauseProg(sShown, DS), cards[DS]);
+    introSwap(sShown);
     moodScene(pauseProg(sShown, MB), cards[MB]);
     collabScene(pauseProg(sShown, CB), cards[CB]);
     shareScene(pauseProg(sShown, SH), cards[SH]);
