@@ -70,7 +70,7 @@
     if (r.bottom < -vh || r.top > vh * 2) return;
     const range = Math.max(1, sec.offsetHeight - vh);
     const P = clamp(-r.top / range, 0, 1);
-    const p = clamp(P / 0.6, 0, 1);
+    const p = clamp(P / 0.97, 0, 1);   // the search scene now uses the whole section
     const key = P.toFixed(4) + '|' + vh;
     if (key === last) return;
     last = key;
@@ -137,23 +137,6 @@
         nt2.style.transform = 'translate3d(calc(' + ((1 - e2) * 100).toFixed(2) + '% + ' + ((1 - e2) * 60).toFixed(1) + 'px),0,0)';
       }
     }
-    // scene 2
-    const s1 = document.getElementById('cn-s1');
-    const s2 = document.getElementById('cn-s2');
-    const sl = seg(P, 0.62, 0.71);
-    const se = sl < 0.5 ? 4 * sl * sl * sl : 1 - Math.pow(-2 * sl + 2, 3) / 2;
-    if (s1) { s1.style.transform = 'translate3d(0,' + (-se * 100).toFixed(3) + '%,0)'; s1.style.opacity = (1 - se * 0.6).toFixed(3); }
-    if (s2) s2.style.transform = 'translate3d(0,' + ((1 - se) * 100).toFixed(3) + '%,0)';
-    const rise = (el, k, d) => { if (!el) return; const e = easeOut(k); el.style.opacity = e.toFixed(3); el.style.transform = 'translate3d(0,' + ((1 - e) * d).toFixed(1) + 'px,0)'; };
-    rise(document.getElementById('cn-head'), seg(P, 0.69, 0.75), 22);
-    rise(document.getElementById('cn-left'), seg(P, 0.72, 0.78), 22);
-    sec.querySelectorAll('.cn-cm').forEach((c, i) => {
-      const a = 0.78 + i * 0.05;
-      const k = seg(P, a, a + 0.045);
-      const e = easeOut(k);
-      c.style.opacity = e.toFixed(3);
-      c.style.transform = 'translate3d(' + ((1 - e) * 36).toFixed(1) + 'px,' + ((1 - e) * 10).toFixed(1) + 'px,0) scale(' + (0.94 + 0.06 * easeBack(k)).toFixed(4) + ')';
-    });
     const cp = seg(p, 0.33, 0.5);
     if (copy) {
       copy.style.opacity = easeOut(cp).toFixed(3);
