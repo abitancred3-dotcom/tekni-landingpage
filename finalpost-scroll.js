@@ -16,7 +16,13 @@
     const r = sec.getBoundingClientRect(), vh = window.innerHeight;
     if (r.bottom < -vh || r.top > vh * 1.5) return;
     const enter = clamp(1 - r.top / vh, 0, 1);
-    const P = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1);
+    const PR = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1);
+    // section is 380vh (280vh of scroll): the colour + rewrite sequence plays over the first 200vh,
+    // then the labels drift up behind the text and fade out before the section leaves
+    const P = clamp(PR * 280 / 200, 0, 1);
+    const X = seg(PR, 0.76, 0.98);
+    const sticky = sec.querySelector('.pr-sticky');
+    const W = sticky ? sticky.clientWidth : window.innerWidth, H = sticky ? sticky.clientHeight : vh;
     const t = (now || 0) / 1000;
     const key = enter.toFixed(4) + '|' + P.toFixed(4) + '|' + vh + '|' + Math.floor(t * 30);
     if (key === last) return;
@@ -29,11 +35,16 @@
       const pop = Math.sin(Math.PI * seg(P, c0, c0 + 0.1));
       const bob = Math.sin(t * 0.9 + i * 1.7) * 4;
       const c = el.dataset.c || '#ea3b6c';
-      el.style.opacity = ea.toFixed(3);
-      el.style.background = 'color-mix(in srgb, ' + c + ' ' + (k * 100).toFixed(1) + '%, #0b0b0b)';
-      el.style.color = 'color-mix(in srgb, #000 ' + (k * 100).toFixed(1) + '%, #f2f2f4)';
-      el.style.borderColor = 'rgba(255,255,255,' + (0.14 * (1 - k)).toFixed(3) + ')';
-      el.style.transform = 'translate(-50%,-50%) translate3d(0,' + ((1 - ea) * 40 + bob).toFixed(2) + 'px,0) rotate(var(--r)) scale(' + (0.9 + 0.1 * ea + 0.06 * pop).toFixed(4) + ')';
+      // exit: each label loses its colour as it lifts off, then drifts up and in behind the headline and fades
+      const x = seg(X, i * 0.06, i * 0.06 + 0.58), ex = smooth(x);
+      const kc = k * (1 - smooth(seg(x, 0, 0.3)));
+      const lx = el.offsetLeft, ly = el.offsetTop;   // resting centre (the label is centred on left/top)
+      const tx = (W / 2 - lx) * 0.6 * ex, ty = (H * 0.47 - ly) * ex - H * 0.06 * ex;
+      el.style.opacity = (ea * (1 - smooth(seg(x, 0.22, 0.72)))).toFixed(3);
+      el.style.background = 'color-mix(in srgb, ' + c + ' ' + (kc * 100).toFixed(1) + '%, #0b0b0b)';
+      el.style.color = 'color-mix(in srgb, #000 ' + (kc * 100).toFixed(1) + '%, #f2f2f4)';
+      el.style.borderColor = 'rgba(255,255,255,' + (0.14 * (1 - kc)).toFixed(3) + ')';
+      el.style.transform = 'translate(-50%,-50%) translate3d(' + tx.toFixed(2) + 'px,' + ((1 - ea) * 40 + bob + ty).toFixed(2) + 'px,0) rotate(var(--r)) scale(' + ((0.9 + 0.1 * ea + 0.06 * pop) * (1 - 0.3 * ex)).toFixed(4) + ')';
     });
 
     // subtext: old words lift away one by one, then the new line writes itself in word by word
