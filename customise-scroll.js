@@ -181,7 +181,7 @@
     const PAD = 20, CAPGAP = 22;
     // the screen box + caption, as one group, is as large as the space allows and
     // vertically centred between the nav and the bottom of the screen
-    const top0 = navB + 24, bot0 = vBot - 28, avail = bot0 - top0;
+    const top0 = navB + 36, bot0 = vBot - 72, avail = bot0 - top0;
     const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
     const s = Math.max(0.2, Math.min((avail - capH - CAPGAP - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.92));
     const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
