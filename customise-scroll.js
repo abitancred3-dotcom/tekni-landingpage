@@ -70,7 +70,10 @@
     const vh = window.innerHeight;
     if (r.bottom < -vh || r.top > vh * 1.5) return;
     const enter = clamp(1 - r.top / vh, 0, 1);
-    const P = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1);
+    // section is 311vh (211vh of scroll). The first 102vh plays as before; the colour step after it
+    // runs 45% faster, mapped back onto the original 300vh timeline so every cue keeps its order.
+    const sNew = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1) * 211;
+    const P = clamp((sNew <= 102 ? sNew : 102 + (sNew - 102) / 0.55) / 300, 0, 1);
     const key = enter.toFixed(4) + '|' + P.toFixed(4) + '|' + vh + '|' + window.innerWidth;
     if (key === last) return;
     last = key;
