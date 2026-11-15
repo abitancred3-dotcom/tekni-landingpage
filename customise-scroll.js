@@ -187,7 +187,10 @@
     const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
     const fy = top0 + (avail - (fh + CAPGAP + capH)) / 2;
     const bcx = (box.x0 + box.x1) / 2, bcy = (box.y0 + box.y1) / 2;
-    const L = { box, s, PAD, fx, fy, fw, fh, bcx, bcy, dx: fx + fw / 2 - bcx, dy: fy + fh / 2 - bcy };
+    // the zoomed-out content sits inside the box with a generous margin (the box itself keeps its size)
+    const IN = portrait ? 44 : 52;
+    const sIn = Math.min((fw - 2 * IN) / bw, (fh - 2 * IN) / bh);
+    const L = { box, s: sIn, PAD, padX: (fw - bw * sIn) / 2, padY: (fh - bh * sIn) / 2, fx, fy, fw, fh, bcx, bcy, dx: fx + fw / 2 - bcx, dy: fy + fh / 2 - bcy };
 
     // caption keeps the width it was measured at (on phones it can be wider than the box, so it stays left-aligned with the page)
     cap.style.left = U(portrait ? Math.min(fx + 4, (1000 - capW) / 2) : fx + 4); cap.style.top = U(fy + fh + CAPGAP);
@@ -309,8 +312,9 @@
     const fr = $('cz-frame');
     if (fr) {
       const ox = L.bcx + L.dx * z, oy = L.bcy + L.dy * z;
-      const x0 = ox + (L.box.x0 - L.bcx) * sc - L.PAD, x1 = ox + (L.box.x1 - L.bcx) * sc + L.PAD;
-      const y0 = oy + (L.box.y0 - L.bcy) * sc - L.PAD, y1 = oy + (L.box.y1 - L.bcy) * sc + L.PAD;
+      const px = L.PAD + (L.padX - L.PAD) * z, py = L.PAD + (L.padY - L.PAD) * z;
+      const x0 = ox + (L.box.x0 - L.bcx) * sc - px, x1 = ox + (L.box.x1 - L.bcx) * sc + px;
+      const y0 = oy + (L.box.y0 - L.bcy) * sc - py, y1 = oy + (L.box.y1 - L.bcy) * sc + py;
       fr.style.left = U(x0); fr.style.top = U(y0); fr.style.width = U(x1 - x0); fr.style.height = U(y1 - y0);
       fr.style.opacity = easeOut(seg(z, 0.15, 0.85)).toFixed(3);
     }
