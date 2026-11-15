@@ -212,12 +212,15 @@
       // screen colour behind each tile (its cell plus half of each surrounding gap) switches on with
       // that tile, hard-edged, so the content underneath is hidden without a soft shadow sweeping across
       backEl = document.createElement('div'); backEl.className = 'cz-back'; grid.appendChild(backEl);
+      // styled inline so a cached older stylesheet can't hide it
+      backEl.style.cssText = 'position:absolute;overflow:hidden;opacity:1;background:none;border-radius:calc(var(--u) * 32)';
+      const BK = 'position:absolute;display:block;background:#000;opacity:0';
       cells.forEach(cell => {
-        const bk = document.createElement('i'); backEl.appendChild(bk);
+        const bk = document.createElement('i'); bk.style.cssText = BK; backEl.appendChild(bk);
         const el = document.createElement('div'); el.className = 'cz-tile'; grid.appendChild(el);
         tiles.push({ el, bk, r: cell.r, c: cell.c, v: cell.v });
       });
-      plusBk = document.createElement('i'); backEl.appendChild(plusBk);
+      plusBk = document.createElement('i'); plusBk.style.cssText = BK; backEl.appendChild(plusBk);
       plusEl = document.createElement('div'); plusEl.className = 'cz-tile'; plusEl.id = 'cz-plus';
       plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
       grid.appendChild(plusEl);
