@@ -162,32 +162,36 @@
     if (L5 && layoutKey === k && !fresh) return L5;
     if (fresh) gridKey = '';
     const Hs = stage.clientHeight / u;
-    let box, pillTop, pillH, bottomLim, cx, maxW, cols, capW;
+    // visible area in stage units: from the bottom of the fixed nav to the bottom of the screen
+    const wrap = stage.parentElement;
+    const vTop = -stage.offsetTop / u, vBot = ((wrap ? wrap.clientHeight : window.innerHeight) - stage.offsetTop) / u;
+    const navEl = document.querySelector('.tk-start') || document.querySelector('.tk-nav');
+    const navB = navEl ? vTop + Math.max(0, navEl.getBoundingClientRect().bottom) / u : vTop + 100;
+    let box, cx, maxW, cols, capW;
     if (!portrait) {
       // content as it sits at the end of the colour step
       box = { x0: 82, x1: 1919, y0: 145, y1: 980 };
-      pillTop = 122; pillH = 56; bottomLim = 978; cx = 1000.5; maxW = 1320; cols = 12; capW = 920;
+      cx = 1000.5; maxW = 1320; cols = 12; capW = 920;
     } else {
-      const navEl = document.querySelector('.tk-start') || document.querySelector('.tk-nav');
-      const navB = navEl ? Math.max(0, navEl.getBoundingClientRect().bottom - stage.getBoundingClientRect().top) / u : 120;
       box = { x0: 30, x1: 970, y0: 200, y1: Hs - 50 };
-      pillTop = navB + 30; pillH = 66; bottomLim = Hs - 50; cx = 500; maxW = 940; cols = 6; capW = 900;
+      cx = 500; maxW = 940; cols = 6; capW = 900;
     }
     cap.style.width = 'calc(var(--u) * ' + capW + ')';
     const capH = cap.offsetHeight / u;
-    const PAD = 20, GAP = 16;
-    const fy = pillTop + pillH + GAP;
-    const fBot = bottomLim - capH - 22;
+    const PAD = 20, CAPGAP = 22;
+    // the screen box sits vertically centred between the nav and the bottom of the screen,
+    // sized so the caption still fits underneath it
+    const cy = (navB + vBot) / 2;
+    const top0 = navB + 24, bot0 = vBot - 30;
+    const half = Math.min(cy - top0, bot0 - capH - CAPGAP - cy);
     const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
-    const s = Math.max(0.2, Math.min((fBot - fy - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.85));
-    const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
+    const s = Math.max(0.2, Math.min((2 * half - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.85));
+    const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2, fy = cy - fh / 2;
     const bcx = (box.x0 + box.x1) / 2, bcy = (box.y0 + box.y1) / 2;
     const L = { box, s, PAD, fx, fy, fw, fh, bcx, bcy, dx: fx + fw / 2 - bcx, dy: fy + fh / 2 - bcy };
 
-    const pill = $('cz-pill2');
-    if (pill) { pill.style.left = U(fx); pill.style.top = U(fy - pillH - GAP); }
-    cap.style.left = U(fx + 4); cap.style.top = U(fy + fh + 20);
-    cap.style.width = 'calc(var(--u) * ' + Math.min(capW, fw).toFixed(1) + ')';
+    // caption keeps the width it was measured at (on phones it can be wider than the box, so it stays left-aligned with the page)
+    cap.style.left = U(portrait ? Math.min(fx + 4, (1000 - capW) / 2) : fx + 4); cap.style.top = U(fy + fh + CAPGAP);
 
     // tile grid: one even gap between every tile, one even border on all four sides;
     // plus tile spans the last 3 rows of the last column
@@ -267,8 +271,7 @@
       fr.style.opacity = easeOut(seg(z, 0.15, 0.85)).toFixed(3);
     }
     const rise = (k) => 'translate3d(0,' + U((1 - easeOut(k)) * 18) + ',0)';
-    const pk = seg(sv, 230, 254), ck = seg(sv, 238, 264);
-    set($('cz-pill2'), easeOut(pk), rise(pk));
+    const ck = seg(sv, 236, 262);
     set($('cz-cap'), easeOut(ck), rise(ck));
 
     // tiles flip over one by one until the screen is full, then the plus pops in
