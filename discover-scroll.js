@@ -389,16 +389,19 @@
     if (c0) c0.style.opacity = (1 - c1 - c2).toFixed(3);
   }
 
-  // Intro paragraph on the left swaps to the alternate copy once the Discussion post is up, holds through Inspiration,
-  // then eases back before Moodboard. raw = scroll position including pauses.
+  // Intro paragraph on the left swaps copy per card: Discussion post -> Inspiration copy, Moodboard -> Moodboard copy,
+  // then back to the original before Collaboration. raw = scroll position including pauses. Height eases between them.
   function introSwap(raw) {
     const pw = document.querySelector('#dv-text .dv-p-wrap'); if (!pw) return;
-    const post = rawOf(DS) + 0.46 * PAUSES[0][1];
-    const sw = smooth(seg(raw, post, post + 0.13)) * (1 - smooth(seg(raw, rawOf(1) + 0.4, rawOf(1) + 0.7)));
-    const p0 = pw.querySelector('.dv-p0'), p1 = pw.querySelector('.dv-p1');
-    p0.style.opacity = (1 - sw).toFixed(3); p1.style.opacity = sw.toFixed(3);
-    pw.style.height = (p0.offsetHeight + (p1.offsetHeight - p0.offsetHeight) * sw).toFixed(1) + 'px';
+    const post = rawOf(DS) + 0.46 * PAUSES[0][1], toMb = rawOf(1) + 0.4, mbEnd = rawOf(MB) + PAUSES[1][1] + 0.4;
+    const r = (a, w) => smooth(seg(raw, a, a + w));
+    const w1 = r(post, 0.13) * (1 - r(toMb, 0.3)), w2 = r(toMb, 0.3) * (1 - r(mbEnd, 0.3)), w = [1 - w1 - w2, w1, w2];
+    const ps = [pw.querySelector('.dv-p0'), pw.querySelector('.dv-p1'), pw.querySelector('.dv-p2')];
+    let h = 0;
+    ps.forEach((el, i) => { if (!el) return; el.style.opacity = w[i].toFixed(3); h += el.offsetHeight * w[i]; });
+    pw.style.height = h.toFixed(1) + 'px';
   }
+
 
   let last = '', sShown = null, lastT = 0;
   function frame(now) {
