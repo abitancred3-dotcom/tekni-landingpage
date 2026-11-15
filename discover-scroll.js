@@ -344,7 +344,7 @@
     const open = parseFloat(card.style.getPropertyValue('--dv-open')) || 0;
     const exp = smooth(seg(open, 0.6, 1));
     const q = sel => card.querySelector(sel), qa = sel => card.querySelectorAll(sel);
-    const gone = smooth(seg(sp, 0.86, 0.92));               // fan icons leave as the moodboard links to the post
+    const gone = smooth(seg(sp, 0.76, 0.82));               // fan icons leave as the moodboard links to the post
     // Personal / Public switch
     const sw = q('.sh-seg');
     if (sw) {
@@ -368,11 +368,11 @@
       el.style.transform = 'translate3d(' + U(dx * (1 - k)) + ',' + U(dy * (1 - k)) + ',0) scale(' + sc.toFixed(4) + ')';
     });
     // portfolio squares appear one by one around a circle
-    qa('.sh-sq').forEach((el, i) => { const t0 = 0.42 + i * 0.036; pop(el, exp * seg(sp, t0, t0 + 0.05)); });
+    qa('.sh-sq').forEach((el, i) => { const t0 = 0.42 + i * 0.02; pop(el, exp * seg(sp, t0, t0 + 0.05)); });
     // + pops up in the middle, then gets clicked
     const plus = q('.sh-plus');
     if (plus) {
-      const e = seg(sp, 0.72, 0.78), press = Math.sin(Math.PI * seg(sp, 0.80, 0.86));
+      const e = seg(sp, 0.60, 0.66), press = Math.sin(Math.PI * seg(sp, 0.68, 0.74));
       const k = exp * smooth(e);
       plus.style.opacity = k.toFixed(3); plus.style.visibility = k > 0.001 ? 'visible' : 'hidden';
       plus.style.transform = 'scale(' + ((0.5 + 0.5 * easeBack(e)) * (1 - 0.1 * press)).toFixed(4) + ')';
@@ -380,7 +380,7 @@
     }
     // moodboard icon lands on the image
     const mb = q('.sh-mb');
-    if (mb) { const e = seg(sp, 0.86, 0.93); mb.style.opacity = (exp * smooth(e)).toFixed(3); mb.style.transform = 'scale(' + (0.4 + 0.6 * easeBack(e)).toFixed(4) + ')'; }
+    if (mb) { const e = seg(sp, 0.76, 0.83); mb.style.opacity = (exp * smooth(e)).toFixed(3); mb.style.transform = 'scale(' + (0.4 + 0.6 * easeBack(e)).toFixed(4) + ')'; }
     // captions
     const c1 = exp * smooth(seg(sp, 0.34, 0.40)) * (1 - gone), c2 = exp * gone;
     const caps = qa('.sh-cap'), c0 = q('.sh-cap0');
