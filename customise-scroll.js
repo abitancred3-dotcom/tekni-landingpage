@@ -70,11 +70,12 @@
     const vh = window.innerHeight;
     if (r.bottom < -vh || r.top > vh * 1.5) return;
     const enter = clamp(1 - r.top / vh, 0, 1);
-    // section is 311vh (211vh of scroll). The first 102vh plays as before; the colour step after it
+    // section is 540vh (S_END = 440vh of scroll). The first 102vh plays as before; the colour step after it
     // runs 45% faster, mapped back onto the original 300vh timeline so every cue keeps its order.
-    const sNew = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1) * 211;
+    // From ~196vh the screen step (zoom out, frame, tiles) runs on sNew directly.
+    const sNew = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1) * S_END;
     const P = clamp((sNew <= 102 ? sNew : 102 + (sNew - 102) / 0.55) / 300, 0, 1);
-    const key = enter.toFixed(4) + '|' + P.toFixed(4) + '|' + vh + '|' + window.innerWidth;
+    const key = enter.toFixed(4) + '|' + sNew.toFixed(2) + '|' + vh + '|' + window.innerWidth + '|' + layoutKey;
     if (key === last) return;
     last = key;
     const $ = id => document.getElementById(id);
@@ -139,6 +140,139 @@
     // 3D model spin target: turns continuously with scroll through the whole section
     spinTarget = Math.PI / 2 + (enter - 1) * 0.9 + P * Math.PI * 2 * 1.5;
     if (!modelStarted && r.top < vh * 2) { modelStarted = true; initModel(); }
+
+    screenScene(sec, sNew, portrait);
+  }
+
+  // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
+  const S_END = 440;
+  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null;
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
+  window.addEventListener('resize', () => { layoutKey = ''; });
+
+  function layoutScreen(sec, portrait) {
+    const stage = sec.querySelector('.cz-stage');
+    const $ = id => document.getElementById(id);
+    const cap = $('cz-cap'), grid = $('cz-grid');
+    if (!stage || !cap || !grid) return null;
+    const u = parseFloat(stage.style.getPropertyValue('--u')) || stage.clientWidth / (portrait ? 1000 : 2000);
+    const k = (stage.dataset.fit || '') + '|' + u.toFixed(4) + (portrait ? 'p' : 'l');
+    // the page runtime can re-render this markup, which drops the generated tiles and inline positions
+    const fresh = !plusEl || plusEl.parentNode !== grid || !cap.style.left;
+    if (L5 && layoutKey === k && !fresh) return L5;
+    if (fresh) gridKey = '';
+    const Hs = stage.clientHeight / u;
+    let box, pillTop, pillH, bottomLim, cx, maxW, cols, capW;
+    if (!portrait) {
+      // content as it sits at the end of the colour step
+      box = { x0: 82, x1: 1919, y0: 145, y1: 980 };
+      pillTop = 122; pillH = 56; bottomLim = 978; cx = 1000.5; maxW = 1320; cols = 12; capW = 920;
+    } else {
+      const navEl = document.querySelector('.tk-start') || document.querySelector('.tk-nav');
+      const navB = navEl ? Math.max(0, navEl.getBoundingClientRect().bottom - stage.getBoundingClientRect().top) / u : 120;
+      box = { x0: 30, x1: 970, y0: 200, y1: Hs - 50 };
+      pillTop = navB + 30; pillH = 66; bottomLim = Hs - 50; cx = 500; maxW = 940; cols = 6; capW = 900;
+    }
+    cap.style.width = 'calc(var(--u) * ' + capW + ')';
+    const capH = cap.offsetHeight / u;
+    const PAD = 20, GAP = 16;
+    const fy = pillTop + pillH + GAP;
+    const fBot = bottomLim - capH - 22;
+    const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
+    const s = Math.max(0.2, Math.min((fBot - fy - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.85));
+    const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
+    const bcx = (box.x0 + box.x1) / 2, bcy = (box.y0 + box.y1) / 2;
+    const L = { box, s, PAD, fx, fy, fw, fh, bcx, bcy, dx: fx + fw / 2 - bcx, dy: fy + fh / 2 - bcy };
+
+    const pill = $('cz-pill2');
+    if (pill) { pill.style.left = U(fx); pill.style.top = U(fy - pillH - GAP); }
+    cap.style.left = U(fx + 4); cap.style.top = U(fy + fh + 20);
+    cap.style.width = 'calc(var(--u) * ' + Math.min(capW, fw).toFixed(1) + ')';
+
+    // tile grid: columns in groups of 3, rows in groups of 2, plus tile spans the last 3 rows of the last column
+    const inset = 16, g = 7, G = 15;
+    const ix = fx + inset, iy = fy + inset, iw = fw - 2 * inset, ih = fh - 2 * inset;
+    const tw = (iw - (cols - 1) * g - (Math.ceil(cols / 3) - 1) * (G - g)) / cols;
+    let rows = portrait ? Math.max(4, Math.round(ih / tw)) : 6;
+    if (rows % 2) rows += 1;
+    const th = (ih - (rows - 1) * g - (rows / 2 - 1) * (G - g)) / rows;
+    const X = c => ix + c * (tw + g) + Math.floor(c / 3) * (G - g);
+    const Y = r => iy + r * (th + g) + Math.floor(r / 2) * (G - g);
+    const gk = cols + 'x' + rows;
+    if (gk !== gridKey) {
+      gridKey = gk; grid.textContent = ''; tiles = [];
+      const cells = [];
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        if (c === cols - 1 && r >= rows - 3) continue;
+        cells.push({ r, c });
+      }
+      // diagonal sweep from the top-left corner (matches the backdrop's 'to bottom right' mask)
+      cells.forEach(cell => { cell.v = (cell.c / (cols - 1) + cell.r / (rows - 1)) / 2; });
+      cells.sort((a, b) => a.v - b.v || a.r - b.r);
+      // dark screen behind the tiles, revealed along the same diagonal so the content underneath disappears
+      backEl = document.createElement('div'); backEl.className = 'cz-back'; grid.appendChild(backEl);
+      cells.forEach(cell => { const el = document.createElement('div'); el.className = 'cz-tile'; grid.appendChild(el); tiles.push({ el, r: cell.r, c: cell.c, v: cell.v }); });
+      plusEl = document.createElement('div'); plusEl.className = 'cz-tile'; plusEl.id = 'cz-plus';
+      plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
+      grid.appendChild(plusEl);
+    }
+    tiles.forEach(t => { const s2 = t.el.style; s2.left = U(X(t.c)); s2.top = U(Y(t.r)); s2.width = U(tw); s2.height = U(th); });
+    const bs = backEl.style;
+    bs.left = U(fx + 1.5); bs.top = U(fy + 1.5); bs.width = U(fw - 3); bs.height = U(fh - 3);
+    const pr = rows - 3;
+    plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
+    plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
+    L5 = L; layoutKey = k;
+    return L;
+  }
+
+  function screenScene(sec, sv, portrait) {
+    const L = layoutScreen(sec, portrait);
+    if (!L) return;
+    const $ = id => document.getElementById(id);
+    // zoom out: content shrinks into the frame position
+    const z = easeIO(seg(sv, 196, 248));
+    const sc = 1 + (L.s - 1) * z;
+    const zoom = $('cz-zoom');
+    if (zoom) {
+      zoom.style.transformOrigin = U(L.bcx) + ' ' + U(L.bcy);
+      zoom.style.transform = z > 0 ? 'translate3d(' + U(L.dx * z) + ',' + U(L.dy * z) + ',0) scale(' + sc.toFixed(4) + ')' : '';
+    }
+    // the frame hugs the shrinking content and fades in around it
+    const fr = $('cz-frame');
+    if (fr) {
+      const ox = L.bcx + L.dx * z, oy = L.bcy + L.dy * z;
+      const x0 = ox + (L.box.x0 - L.bcx) * sc - L.PAD, x1 = ox + (L.box.x1 - L.bcx) * sc + L.PAD;
+      const y0 = oy + (L.box.y0 - L.bcy) * sc - L.PAD, y1 = oy + (L.box.y1 - L.bcy) * sc + L.PAD;
+      fr.style.left = U(x0); fr.style.top = U(y0); fr.style.width = U(x1 - x0); fr.style.height = U(y1 - y0);
+      fr.style.opacity = easeOut(seg(z, 0.15, 0.85)).toFixed(3);
+    }
+    const rise = (k) => 'translate3d(0,' + U((1 - easeOut(k)) * 18) + ',0)';
+    const pk = seg(sv, 230, 254), ck = seg(sv, 238, 264);
+    set($('cz-pill2'), easeOut(pk), rise(pk));
+    set($('cz-cap'), easeOut(ck), rise(ck));
+
+    // tiles flip over one by one until the screen is full, then the plus pops in
+    const tp = seg(sv, 262, 396), N = tiles.length, W = 0.07;
+    for (let i = 0; i < N; i++) {
+      const a = (i / Math.max(1, N - 1)) * (1 - W);
+      const t = seg(tp, a, a + W), e = easeOut(t);
+      const st = tiles[i].el.style;
+      st.opacity = t > 0 ? Math.min(1, t * 3).toFixed(3) : '0';
+      st.transform = t > 0 && t < 1 ? 'perspective(700px) rotateY(' + ((1 - e) * -120).toFixed(1) + 'deg) scale(' + (0.9 + 0.1 * e).toFixed(3) + ')' : '';
+    }
+    if (backEl) {
+      const j = Math.floor(tp / (1 - W) * (N - 1));
+      const X = tp <= 0 ? -0.1 : tp >= 1 ? 1.2 : (j >= N - 1 ? 1.2 : tiles[Math.max(0, j)].v + 0.04);
+      const m = 'linear-gradient(to bottom right,#000 ' + (X * 100).toFixed(2) + '%,transparent ' + (X * 100 + 5).toFixed(2) + '%)';
+      backEl.style.webkitMaskImage = m; backEl.style.maskImage = m;
+      backEl.style.opacity = tp > 0 ? '1' : '0';
+    }
+    if (plusEl) {
+      const q = seg(sv, 394, 414);
+      plusEl.style.opacity = easeOut(q).toFixed(3);
+      plusEl.style.transform = q < 1 ? 'perspective(700px) rotateY(' + ((1 - easeOut(q)) * -120).toFixed(1) + 'deg) scale(' + (0.85 + 0.15 * easeBack(q)).toFixed(3) + ')' : '';
+    }
   }
 
   // ---------- 3D model in the feed ----------

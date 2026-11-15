@@ -15,7 +15,7 @@
 <script src="ds/nocturne-f87c1377-d333-41bd-8613-595dd8a7ce51/_ds_bundle.js?v=be23066613"></script>
 <script src="./smooth-scroll.js?v=20e9634dae"></script>
 <script src="./connect-scroll.js?v=4d856f1320"></script>
-<script src="./customise-scroll.js?v=af790d0cf3"></script>
+<script src="./customise-scroll.js?v=e438f96f1e"></script>
 <script src="./discover-scroll.js?v=d2008b6178"></script>
 <style>
   :root{
@@ -433,6 +433,25 @@
   .cz-seg svg{width:calc(var(--u)*13);height:calc(var(--u)*13)}
   .cz-compose{position:absolute;right:calc(var(--u)*17);top:calc(var(--u)*106);width:calc(var(--u)*26);height:calc(var(--u)*26);border-radius:calc(var(--u)*6);background:#1a1a1c;display:flex;align-items:center;justify-content:center}
   .cz-compose svg{width:calc(var(--u)*14);height:calc(var(--u)*14)}
+  /* 5. zoom out into a screen, tiles flip in */
+  #cz-zoom{position:absolute;inset:0;z-index:2;will-change:transform}
+  #cz-frame{position:absolute;z-index:1;border-radius:calc(var(--u)*40);border:1.5px solid rgba(255,255,255,0.16);background:#040404;opacity:0;pointer-events:none}
+  #cz-grid{position:absolute;inset:0;z-index:5;pointer-events:none}
+  .cz-tile{position:absolute;border-radius:calc(var(--u)*8);background:#141414;border:1px solid rgba(255,255,255,0.05);opacity:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:transform,opacity}
+  .cz-back{position:absolute;border-radius:calc(var(--u)*38);background:#060606;opacity:0}
+  #cz-plus{display:flex;align-items:center;justify-content:center;background:#0c0c0c;border:1px dashed rgba(255,255,255,0.3)}
+  #cz-plus svg{width:calc(var(--u)*30);height:calc(var(--u)*30);display:block}
+  #cz-pill2{position:absolute;z-index:6;width:calc(var(--u)*210);height:calc(var(--u)*56);font-size:calc(var(--u)*27);opacity:0}
+  #cz-cap{position:absolute;z-index:6;opacity:0}
+  #cz-cap h3{margin:0;font-size:max(26px,calc(var(--u)*50));font-weight:600;line-height:1.1;letter-spacing:-0.01em;color:#fff}
+  #cz-cap p{margin:0;font-size:max(15px,calc(var(--u)*25));font-weight:300;line-height:1.3;color:#d2d2d4}
+  #cz-cap .cz-cap-b{margin-top:calc(var(--u)*12);font-weight:600;color:#e8e8ea}
+  @media (max-aspect-ratio:1/1){
+    #cz-pill2{width:calc(var(--u)*240);height:calc(var(--u)*66);font-size:calc(var(--u)*30)}
+    #cz-cap h3{font-size:calc(var(--u)*62)}
+    #cz-cap p{font-size:calc(var(--u)*34)}
+    #cz-plus svg{width:calc(var(--u)*40);height:calc(var(--u)*40)}
+  }
   @media (max-aspect-ratio:1/1){
     .cz-stage{width:100vw;height:100vh;--u:calc(100vw / 1000)}
     #cz-text{left:calc(var(--u)*60);top:calc(var(--u)*230);width:calc(var(--u)*880)}
@@ -610,9 +629,11 @@
   </div>
 </section>
 
-<section id="customise" aria-label="Customise your feed" style="position:relative;height:311vh;background:#000">
+<section id="customise" aria-label="Customise your feed" style="position:relative;height:540vh;background:#000">
   <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
     <div class="cz-stage">
+      <div id="cz-frame" aria-hidden="true"></div>
+      <div id="cz-zoom">
 
       <div id="cz-text">
         <div class="cz-pill">Customise</div>
@@ -701,6 +722,14 @@
         </div>
       </div>
 
+      </div>
+      <div id="cz-grid" aria-hidden="true"></div>
+      <div id="cz-pill2" class="cz-pill">Customise</div>
+      <div id="cz-cap">
+        <h3>Make it your own.</h3>
+        <p class="cz-cap-b">Create a portfolio that reflects your personal style and creative identity.</p>
+        <p>Customise the layout, choose how your work is displayed and arrange your projects to create a space that feels uniquely yours.</p>
+      </div>
     </div>
   </div>
 </section>
