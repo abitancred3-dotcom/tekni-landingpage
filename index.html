@@ -17,6 +17,7 @@
 <script src="./connect-scroll.js?v=4d856f1320"></script>
 <script src="./customise-scroll.js?v=6b64a6c725"></script>
 <script src="./discover-scroll.js?v=f98a7ace3e"></script>
+<script src="./finalpost-scroll.js?v=24bb26616c"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -78,6 +79,21 @@
   @keyframes copiedBlink{0%,60%{opacity:0;transform:translate3d(0,4px,0)}70%,88%{opacity:1;transform:translate3d(0,0,0)}100%{opacity:0;transform:translate3d(0,-4px,0)}}
   @keyframes countUp{0%,100%{transform:translate3d(0,0,0)}48%{transform:translate3d(0,-100%,0)}}
   @keyframes glowBreathe{0%,100%{opacity:0.5}50%{opacity:0.85}}
+  /* ---------- "More than the final post." ---------- */
+  .pr-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+  .pr-copy{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:92vw;text-align:center;z-index:2}
+  .pr-h{margin:0;font-size:clamp(34px,4.9vw,112px);font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:#fff}
+  .pr-sub{margin:clamp(6px,0.6vw,14px) 0 0;display:grid;font-size:clamp(20px,3.25vw,74px);font-weight:400;line-height:1.2;letter-spacing:-0.01em;color:#fff}
+  .pr-l{grid-area:1/1;display:block}
+  .pr-w{display:inline-block;will-change:transform,opacity,filter}
+  .pr-l1 .pr-w{opacity:0}
+  .pr-tag{position:absolute;left:var(--x);top:var(--y);z-index:1;display:inline-flex;align-items:center;white-space:nowrap;height:clamp(40px,3.7vw,84px);padding:0 clamp(18px,1.95vw,44px);border-radius:clamp(8px,0.6vw,14px);border:1px solid rgba(255,255,255,0.14);background:#0b0b0b;color:#f2f2f4;font-size:clamp(16px,1.8vw,42px);font-weight:400;transform:translate(-50%,-50%) rotate(var(--r));will-change:transform,background-color,color}
+  @media (max-aspect-ratio:1/1){
+    .pr-tag{left:var(--px);top:var(--py);font-size:clamp(13px,3.6vw,24px);height:clamp(32px,8.4vw,52px);padding:0 clamp(12px,3.6vw,22px)}
+    .pr-h{font-size:clamp(28px,8.4vw,60px)}
+    .pr-sub{font-size:clamp(18px,5.6vw,40px)}
+    .pr-copy{top:51%}
+  }
   /* ---------- Hero: "A space to create, share and <word>" ---------- */
   @keyframes hrUp{0%{opacity:0;transform:translate3d(0,28px,0)}100%{opacity:1;transform:none}}
   @keyframes hrCard1{0%{opacity:0;transform:translate(-50%,-50%) translate3d(0,60px,0) rotate(-14deg)}100%{opacity:1;transform:translate(-50%,-50%) rotate(-7deg)}}
@@ -503,6 +519,22 @@
   <div class="hr-copy">
     <h1 class="hr-h">A space to create,<br>share and <span id="hr-word" class="hr-word" style="background:#e0386d"><span id="hr-word-t" class="hr-word-t">connect</span></span></h1>
     <button type="button" class="hr-btn" onClick="{{ heroInspiration }}">Inspiration</button>
+  </div>
+</section>
+
+<section id="process" aria-label="More than the final post" style="position:relative;height:300vh;background:#000">
+  <div class="pr-sticky">
+    <span class="pr-tag" style="--x:28%;--y:37%;--r:-5deg;--px:24%;--py:29%" data-c="#ea3b6c">Moodboards</span>
+    <span class="pr-tag" style="--x:49.4%;--y:39.7%;--r:4deg;--px:66%;--py:25%" data-c="#c5dc72">Experiments</span>
+    <span class="pr-tag" style="--x:70.2%;--y:38%;--r:6deg;--px:72%;--py:34%" data-c="#96c3ec">Sketches</span>
+    <span class="pr-tag" style="--x:25.3%;--y:69.2%;--r:-6deg;--px:27%;--py:68%" data-c="#cba7da">Test Renders</span>
+    <span class="pr-tag" style="--x:38%;--y:71.2%;--r:2deg;--px:64%;--py:74%" data-c="#fef18a">Storyboards</span>
+    <span class="pr-tag" style="--x:65.1%;--y:71.4%;--r:-6deg;--px:28%;--py:79%" data-c="#e396b3">Mockups</span>
+    <span class="pr-tag" style="--x:77.4%;--y:69%;--r:7deg;--px:75%;--py:66%" data-c="#96c3ec">Prototypes</span>
+    <div class="pr-copy">
+      <h2 class="pr-h">More than the final post.</h2>
+      <p class="pr-sub"><span class="pr-l pr-l0"><span class="pr-w">Your</span> <span class="pr-w">ideas,</span> <span class="pr-w">process</span> <span class="pr-w">and</span> <span class="pr-w">everything</span> <span class="pr-w">in</span> <span class="pr-w">between.</span></span><span class="pr-l pr-l1" aria-hidden="true"><span class="pr-w">A</span> <span class="pr-w">social</span> <span class="pr-w">platform</span> <span class="pr-w">designed</span> <span class="pr-w">for</span> <span class="pr-w">the</span> <span class="pr-w">creative</span> <span class="pr-w">process.</span></span></p>
+    </div>
   </div>
 </section>
 
