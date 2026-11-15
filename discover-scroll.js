@@ -338,7 +338,7 @@
   }
 
   // ---------- Share sequence: icons fan out, Share lights up, Public, portfolio circle, + clicked, moodboard linked ----------
-  const SH_FAN = [[-109, 120, 0.03], [-169, 2, 0.06], [-121, -116, 0.09]];   // each icon springs out from behind the image's edge: [dx, dy, start]
+  const SH_FAN = [[-82, 83, 0.02], [-119, 7, 0.035], [-89, -69, 0.05]];   // each icon springs out from behind the image's edge: [dx, dy, start]
   function shareScene(sp, card) {
     if (!card) return;
     const open = parseFloat(card.style.getPropertyValue('--dv-open')) || 0;
@@ -355,10 +355,10 @@
     }
     // icons fan out from behind the image
     qa('.sh-ic').forEach((el, i) => {
-      const [dx, dy, t0] = SH_FAN[i], e = seg(sp, t0, t0 + 0.08), k = smooth(e);
+      const [dx, dy, t0] = SH_FAN[i], e = seg(sp, t0, t0 + 0.05), k = smooth(e);
       let sc = 0.3 + 0.7 * easeBack(e), bg = '';
       if (i === 1) {                                           // Share comes out small and grey, then pops big and blue
-        const h = seg(sp, 0.22, 0.29), hk = smooth(h);
+        const h = seg(sp, 0.14, 0.21), hk = smooth(h);
         sc *= 0.8 + 0.55 * easeBack(h);
         if (hk > 0.001) bg = 'rgb(' + [[28, 142], [28, 197], [30, 240]].map(([a, b]) => Math.round(a + (b - a) * hk)).join(',') + ')';
         el.style.zIndex = hk > 0 ? '2' : '';
