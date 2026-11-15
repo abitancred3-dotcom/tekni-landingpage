@@ -398,6 +398,8 @@
     const w1 = r(post, 0.13) * (1 - r(toMb, 0.3)), w2 = r(toMb, 0.3) * (1 - r(mbEnd, 0.3)), w3 = r(mbEnd, 0.3) * (1 - r(cbEnd, 0.3)), w4 = r(cbEnd, 0.3);
     const w = [1 - w1 - w2 - w3 - w4, w1, w2, w3, w4];
     const ps = [0, 1, 2, 3, 4].map(i => pw.querySelector('.dv-p' + i));
+    // if a page copy is missing one of the paragraphs (e.g. an older cached page), its share falls back to the original text
+    ps.forEach((el, i) => { if (!el && i) { w[0] += w[i]; w[i] = 0; } });
     let h = 0;
     ps.forEach((el, i) => { if (!el) return; el.style.opacity = w[i].toFixed(3); h += el.offsetHeight * w[i]; });
     pw.style.height = h.toFixed(1) + 'px';
