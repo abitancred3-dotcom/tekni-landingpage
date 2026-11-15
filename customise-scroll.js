@@ -145,8 +145,8 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 440;
-  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null;
+  const S_END = 580;
+  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
   window.addEventListener('resize', () => { layoutKey = ''; });
 
@@ -228,6 +228,7 @@
       plusEl = document.createElement('div'); plusEl.className = 'cz-tile'; plusEl.id = 'cz-plus';
       plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
       grid.appendChild(plusEl);
+      buildMenuAndImage(grid);
     }
     // corners concentric with the screen frame (frame radius 34, minus border and inset); all tiles share the plus tile's fill
     const TR = U(34 - B - inset);
@@ -245,8 +246,52 @@
     place(plusBk, cols - 1, cols - 1, pr, rows - 1);
     plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
     plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
+    // geometry the add-image step needs
+    const p = (tw + g) * (portrait ? 1.6 : 1);
+    L.G = { X, Y, tw, th, g, cols, rows, pr, TR, p };
+    const ms = menuEl.style;
+    ms.setProperty('--p', U(p));
+    ms.width = U(p * 2.45);
+    ms.right = 'auto';
+    ms.left = U(X(cols - 1) - 0.09 * p - p * 2.45);
+    ms.top = 'auto';
+    ms.bottom = 'calc(100% - ' + U(Y(rows - 1) + th) + ')';
+    imgEl.style.borderRadius = TR;
     L5 = L; layoutKey = k;
     return L;
+  }
+
+  // "+" menu and the image box that gets added and resized
+  const ICONS = {
+    image: '<path d="M3 5.5A1.5 1.5 0 0 1 4.5 4h15A1.5 1.5 0 0 1 21 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5zM6 17h12l-4.2-5.6-3.1 4-2.1-2.5zM16.5 10a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4z" fill-rule="evenodd"/>',
+    video: '<rect x="2.5" y="6" width="13.5" height="12" rx="2.5"/><path d="m17.5 10.2 4-2.4v8.4l-4-2.4z"/>',
+    carousel: '<rect x="7.5" y="5" width="9" height="14" rx="1.5"/><rect x="2.5" y="7" width="3.5" height="10" rx="1"/><rect x="18" y="7" width="3.5" height="10" rx="1"/>',
+    text: '<path d="M4 20 10 4h2.6l6 16h-3l-1.4-4H8.4L7 20zm5.3-6.6h4L11.3 7.6z"/><path d="M19 13.5s2.5 2.8 2.5 4.3a2.5 2.5 0 0 1-5 0c0-1.5 2.5-4.3 2.5-4.3z"/>',
+    embed: '<path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5zm7 2v7l6-3.5z" fill-rule="evenodd"/>',
+    model: '<path d="m12 2.5 8.5 4.8-8.5 4.9-8.5-4.9z"/><path d="M3 8.6 11.3 13.4V22L3 17.2zM21 8.6v8.6L12.7 22v-8.6z"/>',
+    project: '<path d="M2.5 6A1.5 1.5 0 0 1 4 4.5h5l2 2.2h9A1.5 1.5 0 0 1 21.5 8.2V9H6.2a1.5 1.5 0 0 0-1.4 1L2.5 16.5z"/><path d="M5.6 10.5h17L19.8 19a1.5 1.5 0 0 1-1.4 1H3z"/>'
+  };
+  const ITEMS = [['image', 'Image', 'Add a photo'], ['video', 'Video', 'Showcase a video'], ['carousel', 'Carousel', 'Multiple media in one tile'],
+    ['text', 'Text', 'Styled text block'], ['embed', 'Embed', 'YouTube, Vimeo, Sketchfab, Figma\u2026'], ['model', '3D Model', '.glb / .gltf / .obj'], ['project', 'Project', 'Nested collage project']];
+  function buildMenuAndImage(grid) {
+    menuEl = document.createElement('div');
+    menuEl.style.cssText = 'position:absolute;z-index:3;opacity:0;display:flex;flex-direction:column;gap:calc(var(--p) * 0.015);padding:calc(var(--p) * 0.1);border-radius:calc(var(--p) * 0.13);background:#161616;box-shadow:0 calc(var(--p) * 0.08) calc(var(--p) * 0.3) rgba(0,0,0,0.55);transform-origin:100% 100%;box-sizing:border-box';
+    ITEMS.forEach(([ic, t, sub], i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:calc(var(--p) * 0.17);padding:calc(var(--p) * 0.07) calc(var(--p) * 0.12);border-radius:calc(var(--p) * 0.09);transform-origin:50% 50%';
+      row.innerHTML = '<svg viewBox="0 0 24 24" fill="#f2f2f4" style="flex:none;width:calc(var(--p) * 0.21);height:calc(var(--p) * 0.21);display:block">' + ICONS[ic] + '</svg>' +
+        '<span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:calc(var(--p) * 0.125);line-height:1.25;color:#f2f2f4;white-space:nowrap">' + t + '</span>' +
+        '<span style="font-size:calc(var(--p) * 0.093);line-height:1.3;color:#a7a7ac;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + sub + '</span></span>';
+      menuEl.appendChild(row);
+      if (i === 0) imgRow = row;
+    });
+    grid.appendChild(menuEl);
+    imgEl = document.createElement('div');
+    imgEl.style.cssText = 'position:absolute;z-index:4;opacity:0;box-sizing:border-box;background:#a9a9a9;border:2px solid var(--cz-acc);transform-origin:0 0';
+    grid.appendChild(imgEl);
+    handleEl = document.createElement('div');
+    handleEl.style.cssText = 'position:absolute;z-index:5;opacity:0;box-sizing:border-box;border-radius:50%;background:#0c0c0c;border:2px solid var(--cz-acc);transform:translate(-50%,-50%)';
+    grid.appendChild(handleEl);
   }
 
   function screenScene(sec, sv, portrait) {
@@ -290,7 +335,53 @@
       const q = seg(sv, 394, 414);
       plusEl.style.opacity = easeOut(q).toFixed(3);
       plusEl.style.transform = q < 1 ? 'perspective(700px) rotateY(' + ((1 - easeOut(q)) * -120).toFixed(1) + 'deg) scale(' + (0.85 + 0.15 * easeBack(q)).toFixed(3) + ')' : '';
+      // plus box lights up pink, stays lit while the menu is open
+      const hl = easeOut(seg(sv, 418, 430)) * (1 - easeOut(seg(sv, 466, 478)));
+      const pc = 'color-mix(in srgb, var(--cz-acc) ' + (hl * 100).toFixed(1) + '%, rgba(255,255,255,0.3))';
+      plusEl.style.borderColor = pc;
+      plusEl.style.borderWidth = hl > 0.01 ? '1.5px' : '';
+      const psvg = plusEl.querySelector('svg');
+      if (psvg) { psvg.style.stroke = 'color-mix(in srgb, var(--cz-acc) ' + (hl * 100).toFixed(1) + '%, #fff)'; psvg.style.strokeWidth = (1.6 + 0.6 * hl).toFixed(2); }
     }
+    addImageScene(L, sv);
+  }
+
+  function addImageScene(L, sv) {
+    if (!menuEl || !L.G) return;
+    const { X, Y, tw, th, g, p } = L.G;
+    // menu pops up beside the plus box
+    const mIn = seg(sv, 430, 444), mOut = seg(sv, 462, 472);
+    const mo = easeOut(mIn) * (1 - easeOut(mOut));
+    menuEl.style.opacity = mo.toFixed(3);
+    menuEl.style.transform = 'scale(' + (0.92 + 0.08 * easeBack(mIn) - 0.04 * mOut).toFixed(4) + ')';
+    menuEl.style.visibility = mo > 0.001 ? 'visible' : 'hidden';
+    // the Image row lights up pink, then is pressed
+    const rh = easeOut(seg(sv, 446, 456));
+    imgRow.style.background = rh > 0 ? 'color-mix(in srgb, var(--cz-acc) ' + (rh * 100).toFixed(1) + '%, transparent)' : '';
+    const sub = imgRow.querySelectorAll('span span')[1];
+    if (sub) sub.style.color = 'color-mix(in srgb, #fff ' + (rh * 85).toFixed(1) + '%, #a7a7ac)';
+    const press = Math.sin(Math.PI * seg(sv, 456, 462));
+    imgRow.style.transform = press > 0 ? 'scale(' + (1 - 0.04 * press).toFixed(4) + ')' : '';
+
+    // image box: appears 3 columns x 4 rows, dragged out one column to a square, then up one row to a landscape rectangle
+    const span = (n, size) => n * (size + g) - g;
+    const ia = seg(sv, 468, 484);
+    const k1 = seg(sv, 488, 518), k2 = seg(sv, 528, 558);
+    const snap = k => easeIO(seg(k, 0.35, 0.68));
+    const cw = 3 + snap(k1), rh2 = 4 - snap(k2);
+    const x0 = X(0), y0 = Y(0);
+    const is = imgEl.style;
+    is.left = U(x0); is.top = U(y0); is.width = U(span(cw, tw)); is.height = U(span(rh2, th));
+    is.opacity = easeOut(ia).toFixed(3);
+    is.transform = ia < 1 ? 'scale(' + (0.9 + 0.1 * easeBack(ia)).toFixed(4) + ')' : '';
+    // the corner dot is dragged smoothly; the box snaps to the squares it passes
+    const dc = 3 + easeIO(k1), dr = 4 - easeIO(k2);
+    const hs = handleEl.style, hd = p * 0.2;
+    hs.width = U(hd); hs.height = U(hd);
+    hs.left = U(x0 + span(dc, tw)); hs.top = U(y0 + span(dr, th));
+    hs.opacity = easeOut(seg(sv, 476, 486)).toFixed(3);
+    const drag = Math.max(Math.sin(Math.PI * k1), Math.sin(Math.PI * k2));
+    hs.transform = 'translate(-50%,-50%) scale(' + (1 + 0.25 * Math.min(1, drag * 3)).toFixed(3) + ')';
   }
 
   // ---------- 3D model in the feed ----------
