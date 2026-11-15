@@ -78,6 +78,32 @@
   @keyframes copiedBlink{0%,60%{opacity:0;transform:translate3d(0,4px,0)}70%,88%{opacity:1;transform:translate3d(0,0,0)}100%{opacity:0;transform:translate3d(0,-4px,0)}}
   @keyframes countUp{0%,100%{transform:translate3d(0,0,0)}48%{transform:translate3d(0,-100%,0)}}
   @keyframes glowBreathe{0%,100%{opacity:0.5}50%{opacity:0.85}}
+  /* ---------- Hero: "A space to create, share and <word>" ---------- */
+  @keyframes hrUp{0%{opacity:0;transform:translate3d(0,28px,0)}100%{opacity:1;transform:none}}
+  @keyframes hrCard1{0%{opacity:0;transform:translate(-50%,-50%) translate3d(0,60px,0) rotate(-14deg)}100%{opacity:1;transform:translate(-50%,-50%) rotate(-7deg)}}
+  @keyframes hrCard2{0%{opacity:0;transform:translate(-50%,-50%) translate3d(0,80px,0) rotate(14deg)}100%{opacity:1;transform:translate(-50%,-50%) rotate(7.5deg)}}
+  @keyframes hrBob{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-10px,0)}}
+  .hr-copy{position:absolute;left:9vw;top:46%;z-index:2;display:flex;flex-direction:column;align-items:flex-start}
+  .hr-h{margin:0;font-size:clamp(38px,4.35vw,92px);font-weight:600;line-height:1.08;letter-spacing:-0.02em;color:#fff;animation:hrUp .9s cubic-bezier(.16,1,.3,1) .1s both}
+  .hr-word{position:relative;display:inline-block;vertical-align:baseline;white-space:nowrap;padding:0 0.13em 0.05em;margin-left:0.02em;border-radius:0.2em;transition:background-color .35s ease}
+  .hr-word-t{display:inline-block;color:#fff;will-change:transform,opacity,filter}
+  .hr-btn{margin-top:clamp(26px,3.6vw,64px);display:inline-flex;align-items:center;justify-content:center;height:clamp(46px,3.9vw,70px);padding:0 clamp(28px,2.9vw,52px);border-radius:clamp(9px,0.8vw,14px);border:1px solid rgba(255,255,255,0.08);background:#1c1c1c;color:#f2f2f4;font:inherit;font-size:clamp(18px,1.65vw,30px);font-weight:400;cursor:pointer;transition:background-color .25s ease;animation:hrUp .9s cubic-bezier(.16,1,.3,1) .28s both}
+  .hr-btn:hover,.hr-btn:focus-visible{background:#262626}
+  .hr-btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .hr-cards{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .hr-card{position:absolute;width:19.5vw;aspect-ratio:0.72}
+  .hr-card-in{width:100%;height:100%;border-radius:clamp(14px,1.3vw,26px);background:#1c1c1c;animation:hrBob 7s ease-in-out infinite}
+  .hr-card1{left:68.5%;top:45%;transform:translate(-50%,-50%) rotate(-7deg);animation:hrCard1 1.1s cubic-bezier(.16,1,.3,1) .2s both}
+  .hr-card2{left:84%;top:56%;transform:translate(-50%,-50%) rotate(7.5deg);animation:hrCard2 1.1s cubic-bezier(.16,1,.3,1) .38s both}
+  .hr-card2 .hr-card-in{animation-delay:-3.5s}
+  @media (max-aspect-ratio:1/1){
+    .hr-copy{left:7vw;right:7vw;top:auto;bottom:16vh}
+    .hr-h{font-size:clamp(26px,7.2vw,64px)}
+    .hr-card{width:36vw}
+    .hr-card1{left:40%;top:29%}
+    .hr-card2{left:63%;top:34%}
+  }
+  @media (prefers-reduced-motion:reduce){.hr-h,.hr-btn,.hr-card,.hr-card-in{animation:none}}
   @keyframes popIn{0%{opacity:0;transform:scale(0.55) rotate(-8deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
   @keyframes bob{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -10px;rotate:1.5deg}}
   .flt{position:absolute;transform:translate(-50%,-50%);z-index:2}
@@ -470,20 +496,14 @@
 <div id="intro" style="display:{{ introDisplay }}">
 
 <section id="stage" style="position:relative;height:100vh;min-height:620px;overflow-x:clip;overflow-y:clip">
-  <div id="stage-logo" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;pointer-events:none;will-change:transform,opacity">
-    <div style="perspective:900px;animation:popIn 1s cubic-bezier(.2,1.1,.4,1) both">
-      <div id="lg-flip" style="position:relative;transform-style:preserve-3d;will-change:transform">
-        <img id="lg-img" src="tekni-wordmark-white.svg" alt="" aria-hidden="true" style="visibility:hidden;display:block;width:clamp(240px,27vw,520px);height:auto">
-        <span id="lg-word" aria-hidden="true" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#f8f8f8;font-weight:800;font-size:clamp(62px,7vw,134px);letter-spacing:-0.045em;line-height:1;white-space:nowrap;opacity:1">share</span>
-      </div>
-    </div>
+  <div class="hr-cards" aria-hidden="true">
+    <div class="hr-card hr-card1"><div class="hr-card-in"></div></div>
+    <div class="hr-card hr-card2"><div class="hr-card-in"></div></div>
   </div>
-  <div class="flt" style="left:32.9%;top:23.6%;width:clamp(73px,12.3vw,197px)"><div class="flt-p" data-depth="1.08"><div class="flt-in" style="animation-delay:0.17s, -6.8s;animation-duration:.9s, 7.8s"><img src="uploads/alien_2.png" alt="" style="rotate:2deg; scale:-1 1;"></div></div></div>
-  <div class="flt" style="left:93.9%;top:21.7%;width:clamp(120px,20.0vw,320px)"><div class="flt-p" data-depth="0.88"><div class="flt-in" style="animation-delay:0.35s, -3.5s;animation-duration:.9s, 5.7s"><img src="uploads/apple_2.png" alt="" style="rotate:9deg;"></div></div></div>
-  <div class="flt" style="left:54.8%;top:33.7%;width:clamp(142px,23.5vw,377px)"><div class="flt-p" data-depth="0.72"><div class="flt-in" style="animation-delay:0.52s, -5.4s;animation-duration:.9s, 7.6s"><img src="uploads/PixelKeyboard.png" alt="" style="rotate:0deg;"></div></div></div>
-  <div class="flt" style="left:9.8%;top:49.8%;width:clamp(48px,8.2vw,130px)"><div class="flt-p" data-depth="0.65"><div class="flt-in" style="animation-delay:0.66s, -1.1s;animation-duration:.9s, 9.0s"><img src="uploads/Demi_with_cam_1.png" alt="" style="rotate:-9deg;"></div></div></div>
-  <div class="flt" style="left:20.6%;top:74.8%;width:clamp(75px,12.5vw,200px)"><div class="flt-p" data-depth="0.87"><div class="flt-in" style="animation-delay:0.84s, -1.7s;animation-duration:.9s, 7.9s"><img src="uploads/clover_1.png" alt="" style="rotate:19deg;"></div></div></div>
-    
+  <div class="hr-copy">
+    <h1 class="hr-h">A space to create,<br>share and <span id="hr-word" class="hr-word" style="background:#e0386d"><span id="hr-word-t" class="hr-word-t">connect</span></span></h1>
+    <button type="button" class="hr-btn" onClick="{{ heroInspiration }}">Inspiration</button>
+  </div>
 </section>
 
 </div>
@@ -813,26 +833,31 @@
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   _startLogoFlip() {
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const seq = ['share', 'inspire', 'create', 'discover', 'connect'];
+    // hero headline: the highlighted word revolves, each on its own colour from the page palette;
+    // the word swaps in place and the pill eases to its new width
+    const seq = [['connect', '#e0386d'], ['collaborate', '#9f72bf'], ['explore', '#3f8fdc'], ['inspire', '#7fa62b'], ['discover', '#d0628f']];
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let i = 0;
-    const flipTo = (next, done) => {
-      const f = document.getElementById('lg-flip'), img = document.getElementById('lg-img'), w = document.getElementById('lg-word');
-      if (!f || !img || !w || this._lgDead) return;
-      const out = f.animate([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(90deg)' }], { duration: 260, easing: 'cubic-bezier(0.55,0,1,0.45)', fill: 'forwards' });
-      out.onfinish = () => {
-        if (next === null) { img.style.visibility = 'visible'; w.style.opacity = '0'; }
-        else { w.textContent = next; w.style.opacity = '1'; img.style.visibility = 'hidden'; }
-        const back = f.animate([{ transform: 'rotateX(-90deg)' }, { transform: 'rotateX(0deg)' }], { duration: 420, easing: 'cubic-bezier(0.2,1.3,0.4,1)', fill: 'forwards' });
-        back.onfinish = done;
-      };
-    };
+    // one cycle per page, even if the component mounts twice
+    clearTimeout(window.__hrCycleT);
     const step = () => {
       if (this._lgDead) return;
+      const pill = document.getElementById('hr-word'), t = document.getElementById('hr-word-t');
+      if (!pill || !t) { this._lgT = window.__hrCycleT = setTimeout(step, 1000); return; }
       i = (i + 1) % seq.length;
-      flipTo(seq[i], () => { this._lgT = setTimeout(step, 1600); });
+      const [word, col] = seq[i];
+      const w0 = pill.getBoundingClientRect().width;
+      t.textContent = word;
+      pill.style.background = col;
+      pill.style.width = '';
+      const w1 = pill.getBoundingClientRect().width;
+      if (!reduce && pill.animate) {
+        pill.animate([{ width: w0 + 'px' }, { width: w1 + 'px' }], { duration: 560, easing: 'cubic-bezier(0.3,1.35,0.45,1)' });
+        t.animate([{ opacity: 0, transform: 'translate3d(0,0.35em,0)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 380, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+      }
+      this._lgT = window.__hrCycleT = setTimeout(step, 2000);
     };
-    this._lgT = setTimeout(step, 2200);
+    this._lgT = window.__hrCycleT = setTimeout(step, 2200);
   }
   _navTo(id, frac) {
     const el = document.getElementById(id); if (!el) return;
@@ -1369,6 +1394,7 @@ class Component extends DCLogic {
       learnMore: () => this._navTo('community', 0),
       navShare: () => this._navTo('process', 0),
       navInspiration: () => this._navTo('workspace', 2 / 3),
+      heroInspiration: () => { const c = document.querySelector('#dv-chips .dv-chip[data-card="1"]'); if (c) c.click(); else this._navTo('discover', 0.32); },
       navConnect: () => this._navTo('community', 0),
       navWorkspace: () => this._navTo('workspace', 0),
       backFromInfo: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
