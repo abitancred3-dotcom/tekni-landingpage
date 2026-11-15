@@ -213,7 +213,7 @@
       // that tile, hard-edged, so the content underneath is hidden without a soft shadow sweeping across
       backEl = document.createElement('div'); backEl.className = 'cz-back'; grid.appendChild(backEl);
       // styled inline so a cached older stylesheet can't hide it
-      backEl.style.cssText = 'position:absolute;overflow:hidden;opacity:1;background:none;border-radius:calc(var(--u) * 32)';
+      backEl.style.cssText = 'position:absolute;overflow:hidden;opacity:1;background:none;border-radius:calc(var(--u) * 32.5)';
       const BK = 'position:absolute;display:block;background:#000;opacity:0';
       cells.forEach(cell => {
         const bk = document.createElement('i'); bk.style.cssText = BK; backEl.appendChild(bk);
@@ -225,7 +225,10 @@
       plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
       grid.appendChild(plusEl);
     }
-    tiles.forEach(t => { const s2 = t.el.style; s2.left = U(X(t.c)); s2.top = U(Y(t.r)); s2.width = U(tw); s2.height = U(th); });
+    // corners concentric with the screen frame (frame radius 34, minus border and inset); all tiles share the plus tile's fill
+    const TR = U(34 - B - inset);
+    tiles.forEach(t => { const s2 = t.el.style; s2.left = U(X(t.c)); s2.top = U(Y(t.r)); s2.width = U(tw); s2.height = U(th); s2.borderRadius = TR; s2.background = '#0c0c0c'; });
+    plusEl.style.borderRadius = TR; plusEl.style.background = '#0c0c0c';
     const bx = fx + B, by = fy + B, bw2 = fw - 2 * B, bh2 = fh - 2 * B;
     const bs = backEl.style;
     bs.left = U(bx); bs.top = U(by); bs.width = U(bw2); bs.height = U(bh2);
