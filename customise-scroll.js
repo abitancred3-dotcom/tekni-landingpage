@@ -146,7 +146,7 @@
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
   const S_END = 440;
-  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null;
+  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
   window.addEventListener('resize', () => { layoutKey = ''; });
 
@@ -189,15 +189,15 @@
     cap.style.left = U(fx + 4); cap.style.top = U(fy + fh + 20);
     cap.style.width = 'calc(var(--u) * ' + Math.min(capW, fw).toFixed(1) + ')';
 
-    // tile grid: columns in groups of 3, rows in groups of 2, plus tile spans the last 3 rows of the last column
-    const inset = 16, g = 7, G = 15;
-    const ix = fx + inset, iy = fy + inset, iw = fw - 2 * inset, ih = fh - 2 * inset;
-    const tw = (iw - (cols - 1) * g - (Math.ceil(cols / 3) - 1) * (G - g)) / cols;
-    let rows = portrait ? Math.max(4, Math.round(ih / tw)) : 6;
-    if (rows % 2) rows += 1;
-    const th = (ih - (rows - 1) * g - (rows / 2 - 1) * (G - g)) / rows;
-    const X = c => ix + c * (tw + g) + Math.floor(c / 3) * (G - g);
-    const Y = r => iy + r * (th + g) + Math.floor(r / 2) * (G - g);
+    // tile grid: one even gap between every tile, one even border on all four sides;
+    // plus tile spans the last 3 rows of the last column
+    const B = 1.5, inset = 14, g = 10;
+    const ix = fx + B + inset, iy = fy + B + inset, iw = fw - 2 * (B + inset), ih = fh - 2 * (B + inset);
+    const tw = (iw - (cols - 1) * g) / cols;
+    const rows = portrait ? Math.max(4, Math.round((ih + g) / (tw + g))) : 6;
+    const th = (ih - (rows - 1) * g) / rows;
+    const X = c => ix + c * (tw + g);
+    const Y = r => iy + r * (th + g);
     const gk = cols + 'x' + rows;
     if (gk !== gridKey) {
       gridKey = gk; grid.textContent = ''; tiles = [];
@@ -209,17 +209,30 @@
       // diagonal sweep from the top-left corner (matches the backdrop's 'to bottom right' mask)
       cells.forEach(cell => { cell.v = (cell.c / (cols - 1) + cell.r / (rows - 1)) / 2; });
       cells.sort((a, b) => a.v - b.v || a.r - b.r);
-      // dark screen behind the tiles, revealed along the same diagonal so the content underneath disappears
+      // screen colour behind each tile (its cell plus half of each surrounding gap) switches on with
+      // that tile, hard-edged, so the content underneath is hidden without a soft shadow sweeping across
       backEl = document.createElement('div'); backEl.className = 'cz-back'; grid.appendChild(backEl);
-      cells.forEach(cell => { const el = document.createElement('div'); el.className = 'cz-tile'; grid.appendChild(el); tiles.push({ el, r: cell.r, c: cell.c, v: cell.v }); });
+      cells.forEach(cell => {
+        const bk = document.createElement('i'); backEl.appendChild(bk);
+        const el = document.createElement('div'); el.className = 'cz-tile'; grid.appendChild(el);
+        tiles.push({ el, bk, r: cell.r, c: cell.c, v: cell.v });
+      });
+      plusBk = document.createElement('i'); backEl.appendChild(plusBk);
       plusEl = document.createElement('div'); plusEl.className = 'cz-tile'; plusEl.id = 'cz-plus';
       plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
       grid.appendChild(plusEl);
     }
     tiles.forEach(t => { const s2 = t.el.style; s2.left = U(X(t.c)); s2.top = U(Y(t.r)); s2.width = U(tw); s2.height = U(th); });
+    const bx = fx + B, by = fy + B, bw2 = fw - 2 * B, bh2 = fh - 2 * B;
     const bs = backEl.style;
-    bs.left = U(fx + 1.5); bs.top = U(fy + 1.5); bs.width = U(fw - 3); bs.height = U(fh - 3);
+    bs.left = U(bx); bs.top = U(by); bs.width = U(bw2); bs.height = U(bh2);
+    // cell edges: halfway into each gap, out to the frame edge on the outer rows/columns (0.6 overlap hides seams)
+    const ex = c => c <= 0 ? 0 : X(c) - g / 2 - bx, ey = r => r <= 0 ? 0 : Y(r) - g / 2 - by;
+    const ex1 = c => c >= cols - 1 ? bw2 : X(c) + tw + g / 2 - bx, ey1 = r => r >= rows - 1 ? bh2 : Y(r) + th + g / 2 - by;
+    const place = (el, c0, c1, r0, r1) => { const st = el.style; st.left = U(ex(c0) - 0.3); st.top = U(ey(r0) - 0.3); st.width = U(ex1(c1) - ex(c0) + 0.6); st.height = U(ey1(r1) - ey(r0) + 0.6); };
+    tiles.forEach(t => place(t.bk, t.c, t.c, t.r, t.r));
     const pr = rows - 3;
+    place(plusBk, cols - 1, cols - 1, pr, rows - 1);
     plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
     plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
     L5 = L; layoutKey = k;
@@ -259,15 +272,11 @@
       const t = seg(tp, a, a + W), e = easeOut(t);
       const st = tiles[i].el.style;
       st.opacity = t > 0 ? Math.min(1, t * 3).toFixed(3) : '0';
+      tiles[i].bk.style.opacity = t > 0 ? '1' : '0';
       st.transform = t > 0 && t < 1 ? 'perspective(700px) rotateY(' + ((1 - e) * -120).toFixed(1) + 'deg) scale(' + (0.9 + 0.1 * e).toFixed(3) + ')' : '';
     }
-    if (backEl) {
-      const j = Math.floor(tp / (1 - W) * (N - 1));
-      const X = tp <= 0 ? -0.1 : tp >= 1 ? 1.2 : (j >= N - 1 ? 1.2 : tiles[Math.max(0, j)].v + 0.04);
-      const m = 'linear-gradient(to bottom right,#000 ' + (X * 100).toFixed(2) + '%,transparent ' + (X * 100 + 5).toFixed(2) + '%)';
-      backEl.style.webkitMaskImage = m; backEl.style.maskImage = m;
-      backEl.style.opacity = tp > 0 ? '1' : '0';
-    }
+    // the plus tile's cell goes dark together with the last ordinary tile
+    if (plusBk) plusBk.style.opacity = tp > (1 - W) ? '1' : '0';
     if (plusEl) {
       const q = seg(sv, 394, 414);
       plusEl.style.opacity = easeOut(q).toFixed(3);
