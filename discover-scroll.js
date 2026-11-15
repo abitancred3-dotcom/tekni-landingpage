@@ -48,7 +48,7 @@
   // The row pauses on some cards while their own sequence plays: [card index, length in cards of scrolling].
   // "raw" is the scroll position including the pauses; s is where the row actually is.
   const DS = 0, MB = 2, CB = 3, SH = 4;
-  const PAUSES = [[DS, 1.6], [MB, 1.5], [CB, 3.0], [SH, 2.4]];
+  const PAUSES = [[DS, 1.6], [MB, 1.5], [CB, 3.0]];
   const PAUSE_TOTAL = PAUSES.reduce((a, p) => a + p[1], 0);
   const sOf = (P, n) => -LEAD + seg(P, P_START, P_END) * (n - 1 + 2 * LEAD + PAUSE_TOTAL);
   const sFromRaw = raw => { let off = 0; for (const [at, len] of PAUSES) { if (raw <= at + off) return raw - off; if (raw < at + off + len) return at; off += len; } return raw - off; };
@@ -395,9 +395,11 @@
     const pw = document.querySelector('#dv-text .dv-p-wrap'); if (!pw) return;
     const post = rawOf(DS) + 0.46 * PAUSES[0][1], toMb = rawOf(1) + 0.4, mbEnd = rawOf(MB) + PAUSES[1][1] + 0.4, cbEnd = rawOf(CB) + PAUSES[2][1] + 0.4;
     const r = (a, w) => smooth(seg(raw, a, a + w));
-    const w1 = r(post, 0.13) * (1 - r(toMb, 0.3)), w2 = r(toMb, 0.3) * (1 - r(mbEnd, 0.3)), w3 = r(mbEnd, 0.3) * (1 - r(cbEnd, 0.3)), w4 = r(cbEnd, 0.3);
-    const w = [1 - w1 - w2 - w3 - w4, w1, w2, w3, w4];
-    const ps = [0, 1, 2, 3, 4].map(i => pw.querySelector('.dv-p' + i));
+    // Collaboration is the last card, so its copy holds to the end of the row
+    const w1 = r(post, 0.13) * (1 - r(toMb, 0.3)), w2 = r(toMb, 0.3) * (1 - r(mbEnd, 0.3)), w3 = r(mbEnd, 0.3);
+    const w = [1 - w1 - w2 - w3, w1, w2, w3];
+    const ps = [0, 1, 2, 3].map(i => pw.querySelector('.dv-p' + i));
+    const p4 = pw.querySelector('.dv-p4'); if (p4) p4.style.opacity = '0';   // stale cached page
     // if a page copy is missing one of the paragraphs (e.g. an older cached page), its share falls back to the original text
     ps.forEach((el, i) => { if (!el && i) { w[0] += w[i]; w[i] = 0; } });
     let h = 0;
@@ -447,7 +449,8 @@
     const widths = [], lefts = [];
     let x0 = 0;
     for (let i = 0; i < N; i++) {
-      const d = Math.abs(sv - i);
+      // the last card stays open through the end of the row instead of closing as the section leaves
+      const d = Math.abs(Math.min(sv, N - 1) - i);
       const e = sine(clamp(1 - (d - HOLD) / RAMP, 0, 1));
       widths[i] = BASE + EXTRA * e;
       lefts[i] = x0; x0 += widths[i] + GAP;
@@ -476,7 +479,6 @@
     introSwap(sShown);
     moodScene(pauseProg(sShown, MB), cards[MB]);
     collabScene(pauseProg(sShown, CB), cards[CB]);
-    shareScene(pauseProg(sShown, SH), cards[SH]);
 
     // light up the chip for the card currently at the front
     const active = Math.round(sc);
