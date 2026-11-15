@@ -283,6 +283,14 @@
     }
     // 3. the post appears, then replies pop in one by one while the counts climb
     pop(card.querySelector('.ds-post'), seg(dp, 0.46, 0.54));
+    // once the post is up, the intro paragraph on the left swaps to the Discussion copy (height eases between the two)
+    const sw = smooth(seg(dp, 0.46, 0.54)) * (side ? parseFloat(side.style.opacity) || 0 : 0);
+    const pw = document.querySelector('#dv-text .dv-p-wrap');
+    if (pw) {
+      const p0 = pw.querySelector('.dv-p0'), p1 = pw.querySelector('.dv-p1');
+      p0.style.opacity = (1 - sw).toFixed(3); p1.style.opacity = sw.toFixed(3);
+      pw.style.height = (p0.offsetHeight + (p1.offsetHeight - p0.offsetHeight) * sw).toFixed(1) + 'px';
+    }
     card.querySelectorAll('.ds-reply').forEach((r, i) => pop(r, seg(dp, REPLIES[i], REPLIES[i] + 0.06)));
     setCount(card.querySelector('.ds-likes'), Math.floor(8 * seg(dp, 0.56, 0.9) + 1e-6));
     setCount(card.querySelector('.ds-comments'), (dp >= 0.66 ? 1 : 0) + (dp >= 0.8 ? 1 : 0));
