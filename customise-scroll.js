@@ -247,7 +247,7 @@
     plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
     // geometry the add-image step needs
     const p = (tw + g) * (portrait ? 1.6 : 1);
-    L.G = { X, Y, tw, th, g, cols, rows, pr, TR, p };
+    L.G = { X, Y, tw, th, g, cols, rows, pr, TR, TRu: 34 - B - inset, p };
     const ms = menuEl.style;
     ms.setProperty('--p', U(p));
     ms.width = U(p * 2.45);
@@ -377,14 +377,16 @@
     is.left = U(x0); is.top = U(y0); is.width = U(span(cw, tw)); is.height = U(span(rh2, th));
     is.opacity = easeOut(ia).toFixed(3);
     is.transform = ia < 1 ? 'scale(' + (0.9 + 0.1 * easeBack(ia)).toFixed(4) + ')' : '';
-    // the corner dot is dragged smoothly; the box snaps to the squares it passes
-    const dc = 3 + easeIO(k1), dr = 4 - easeIO(k2);
+    // the dot sits on the box's rounded corner and travels with it; it fills pink while the box is being resized
+    const { TRu } = L.G;
+    const ci = TRu * (1 - Math.SQRT1_2);
     const hs = handleEl.style, hd = p * 0.2;
     hs.width = U(hd); hs.height = U(hd);
-    hs.left = U(x0 + span(dc, tw)); hs.top = U(y0 + span(dr, th));
+    hs.left = U(x0 + span(cw, tw) - ci); hs.top = U(y0 + span(rh2, th) - ci);
     hs.opacity = easeOut(seg(sv, 476, 486)).toFixed(3);
-    const drag = Math.max(Math.sin(Math.PI * k1), Math.sin(Math.PI * k2));
-    hs.transform = 'translate(-50%,-50%) scale(' + (1 + 0.25 * Math.min(1, drag * 3)).toFixed(3) + ')';
+    const act = Math.min(1, Math.max(seg(k1, 0, 0.12) * (1 - seg(k1, 0.88, 1)), seg(k2, 0, 0.12) * (1 - seg(k2, 0.88, 1))));
+    hs.background = 'color-mix(in srgb, var(--cz-acc) ' + (act * 100).toFixed(1) + '%, #0c0c0c)';
+    hs.transform = 'translate(-50%,-50%) scale(' + (1 + 0.15 * act).toFixed(3) + ')';
   }
 
   // ---------- 3D model in the feed ----------
