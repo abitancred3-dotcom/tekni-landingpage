@@ -488,5 +488,7 @@
     });
     cards.forEach((c, i) => { c.dataset.on = i === active ? '1' : '0'; });
   }
+  // the vertical feature carousel further down the page replays these same card sequences
+  window.__dvScenes = { discScene, moodScene, collabScene };
   requestAnimationFrame(frame);
 })();

@@ -16,8 +16,8 @@
 <script src="./smooth-scroll.js?v=20e9634dae"></script>
 <script src="./connect-scroll.js?v=4d856f1320"></script>
 <script src="./customise-scroll.js?v=6b64a6c725"></script>
-<script src="./discover-scroll.js?v=f98a7ace3e"></script>
-<script src="./finalpost-scroll.js?v=3610516fff"></script>
+<script src="./discover-scroll.js?v=f8383738e3"></script>
+<script src="./finalpost-scroll.js?v=a6afb793aa"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -79,6 +79,43 @@
   @keyframes copiedBlink{0%,60%{opacity:0;transform:translate3d(0,4px,0)}70%,88%{opacity:1;transform:translate3d(0,0,0)}100%{opacity:0;transform:translate3d(0,-4px,0)}}
   @keyframes countUp{0%,100%{transform:translate3d(0,0,0)}48%{transform:translate3d(0,-100%,0)}}
   @keyframes glowBreathe{0%,100%{opacity:0.5}50%{opacity:0.85}}
+  /* ---------- "More than the final post." timeline ---------- */
+  .pt-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:4vh;box-sizing:border-box}
+  .pt-h{margin:0;font-size:clamp(28px,2.75vw,66px);font-weight:600;letter-spacing:-0.01em;line-height:1.15;color:#fff;text-align:center}
+  .pt-line{position:relative;width:57vw;height:calc(clamp(40px,3.6vw,86px) + clamp(70px,5.2vw,124px));margin-top:clamp(18px,2.4vw,56px)}
+  .pt-lab{position:absolute;top:0;transform:translateX(-50%);display:flex;align-items:center;white-space:nowrap;height:clamp(40px,3.6vw,86px);padding:0 clamp(20px,2.6vw,62px);border-radius:clamp(8px,0.55vw,13px);border:1px solid rgba(255,255,255,0.12);background:#0b0b0b;color:#f2f2f4;font-size:clamp(17px,1.6vw,38px);font-weight:400}
+  .pt-track{position:absolute;left:0;right:0;bottom:0;height:clamp(28px,2.1vw,50px)}
+  .pt-rule{position:absolute;left:0;right:0;top:50%;height:1px;background:#3a3a3d}
+  .pt-dot{position:absolute;top:50%;width:clamp(26px,2.1vw,50px);height:clamp(26px,2.1vw,50px);border-radius:50%;box-sizing:border-box;border:1.5px solid #4a4a4e;background:#000;box-shadow:0 0 0 clamp(10px,1.6vw,38px) #000;transform:translate(-50%,-50%);will-change:transform}
+  .pt-sub{margin:clamp(18px,2.6vw,60px) 0 0;font-size:clamp(18px,2.3vw,55px);font-weight:400;line-height:1.25;letter-spacing:-0.01em;color:#fff;text-align:center;padding:0 4vw}
+  /* ---------- vertical feature carousel ---------- */
+  .vc-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+  .vc-text{position:absolute;left:7vw;top:55%;transform:translateY(-50%);width:34vw;z-index:2}
+  .vc-h{margin:0;font-size:clamp(26px,2.55vw,62px);font-weight:600;line-height:1.12;letter-spacing:-0.01em;color:#fff}
+  .vc-ds{position:relative;margin-top:clamp(8px,0.8vw,20px)}
+  .vc-d{position:absolute;left:0;top:0;width:100%;max-width:28vw;margin:0;font-size:clamp(16px,1.75vw,42px);font-weight:300;line-height:1.3;color:#d8d8da;opacity:0}
+  .vc-col{position:absolute;top:55%;--u:min(calc(46.7vw / 980),calc(78vh / 920));width:calc(var(--u) * 980);left:calc(91.6vw - var(--u) * 980);height:0}
+  .vc-col *{box-sizing:border-box}
+  .vc-stack{position:absolute;left:0;top:0;width:100%;height:0}
+  .vc-stack > .dv-card{position:absolute;left:0;top:0;width:calc(var(--u)*980);height:calc(var(--u)*106);overflow:hidden;will-change:transform,height,width}
+  #vc .dv-cap{display:none}
+  .vc-peek{position:absolute;right:calc(var(--u)*30);top:calc(var(--u)*28);width:calc(var(--u)*50);height:calc(var(--u)*50);display:flex;align-items:center;justify-content:center;opacity:0}
+  .vc-peek svg{width:calc(var(--u)*40);height:calc(var(--u)*40);display:block}
+  .vc-dots{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:radial-gradient(circle,#2c2c2e calc(var(--u)*1.4),transparent calc(var(--u)*1.9));background-size:calc(var(--u)*40) calc(var(--u)*40);background-position:calc(var(--u)*4) calc(var(--u)*4)}
+  .vc-mbimg{position:absolute;left:calc(var(--u)*108);top:calc(var(--u)*139);width:calc(var(--u)*321);padding:calc(var(--u)*15) calc(var(--u)*15) calc(var(--u)*13.5);border:1px solid rgba(255,255,255,0.13);border-radius:calc(var(--u)*10);background:#000}
+  .vc-mbimg .dv-ghost-img{height:calc(var(--u)*200);border-radius:calc(var(--u)*8)}
+  @media (max-aspect-ratio:1/1){
+    .pt-line{width:86vw;height:calc(clamp(34px,8.6vw,64px) + clamp(56px,13vw,96px))}
+    .pt-h{font-size:clamp(26px,7.4vw,52px)}
+    .pt-lab{font-size:clamp(15px,4vw,28px);height:clamp(34px,8.6vw,64px);padding:0 clamp(14px,4.4vw,32px)}
+    .pt-dot{width:clamp(20px,5.4vw,40px);height:clamp(20px,5.4vw,40px);box-shadow:0 0 0 clamp(6px,2.2vw,16px) #000}
+    .pt-sub{font-size:clamp(18px,5.4vw,40px)}
+    .vc-text{left:6vw;right:6vw;width:auto;top:max(84px,11vh);transform:none}
+    .vc-h{font-size:clamp(22px,6.4vw,46px)}
+    .vc-d{max-width:none;font-size:clamp(14px,4vw,28px)}
+    .vc-col{--u:min(calc(92vw / 880),calc(50vh / 1030));width:calc(var(--u) * 880);left:calc(50vw - var(--u) * 440);top:64%}
+    .vc-stack > .dv-card{width:calc(var(--u)*880)}
+  }
   /* ---------- "More than the final post." ---------- */
   .pr-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
   .pr-copy{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:92vw;text-align:center;z-index:2}
@@ -522,19 +559,109 @@
   </div>
 </section>
 
-<section id="process" aria-label="More than the final post" style="position:relative;height:380vh;background:#000">
-  <div class="pr-sticky">
-    <span class="pr-tag" style="--x:28%;--y:calc(54% - 9.4vw);--r:-5deg;--px:24%;--py:29%" data-c="#ea3b6c">Moodboards</span>
-    <span class="pr-tag" style="--x:49.4%;--y:calc(54% - 8vw);--r:4deg;--px:66%;--py:25%" data-c="#c5dc72">Experiments</span>
-    <span class="pr-tag" style="--x:70.2%;--y:calc(54% - 9vw);--r:6deg;--px:72%;--py:34%" data-c="#96c3ec">Sketches</span>
-    <span class="pr-tag" style="--x:25.3%;--y:calc(54% + 8.8vw);--r:-6deg;--px:27%;--py:68%" data-c="#cba7da">Test Renders</span>
-    <span class="pr-tag" style="--x:38%;--y:calc(54% + 9.8vw);--r:2deg;--px:64%;--py:74%" data-c="#fef18a">Storyboards</span>
-    <span class="pr-tag" style="--x:65.1%;--y:calc(54% + 10vw);--r:-6deg;--px:28%;--py:79%" data-c="#e396b3">Mockups</span>
-    <span class="pr-tag" style="--x:77.4%;--y:calc(54% + 8.6vw);--r:7deg;--px:75%;--py:66%" data-c="#96c3ec">Prototypes</span>
-    <div class="pr-copy">
-      <h2 class="pr-h">More than the final post.</h2>
-      <p class="pr-sub"><span class="pr-l pr-l0"><span class="pr-w">Your</span> <span class="pr-w">ideas,</span> <span class="pr-w">process</span> <span class="pr-w">and</span> <span class="pr-w">everything</span> <span class="pr-w">in</span> <span class="pr-w">between.</span></span><span class="pr-l pr-l1" aria-hidden="true"><span class="pr-w">A</span> <span class="pr-w">social</span> <span class="pr-w">platform</span> <span class="pr-w">designed</span> <span class="pr-w">for</span> <span class="pr-w">the</span> <span class="pr-w">creative</span> <span class="pr-w">process.</span></span></p>
+<section id="process" aria-label="More than the final post" style="position:relative;height:200vh;background:#000">
+  <div class="pt-sticky">
+    <h2 class="pt-h">More than the final post.</h2>
+    <div class="pt-line">
+      <span class="pt-lab" style="left:13.9%">Idea</span><span class="pt-lab" style="left:86.3%">Outcome</span>
+      <div class="pt-track"><span class="pt-rule"></span><span class="pt-dot" style="left:13.9%"></span><span class="pt-dot" style="left:38%"></span><span class="pt-dot" style="left:62.2%"></span><span class="pt-dot" style="left:86.3%"></span></div>
     </div>
+    <p class="pt-sub">Share your ideas, process and everything in between.</p>
+  </div>
+</section>
+
+<section id="vc" aria-label="A social platform designed for the creative process" style="position:relative;height:640vh;background:#000">
+  <div class="vc-sticky">
+    <div class="vc-text">
+      <h2 class="vc-h">A social platform designed<br>for the creative process.</h2>
+      <div class="vc-ds"><p class="vc-d" data-k="insp">Explore what others are working on, browse finished projects and find new ideas, styles and perspectives to spark your own creativity.</p><p class="vc-d" data-k="disc">A space for the creative community to connect, exchange ideas and ask questions.</p><p class="vc-d" data-k="collab">Working on a group project or creative collaboration?</p><p class="vc-d" data-k="mood">Bring your ideas together and build visual collections of inspiration.</p></div>
+    </div>
+    <div class="vc-col"><div class="vc-stack">
+<article data-k="insp" class="dv-card" aria-label="Inspiration">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f2f2f4"></circle><path d="M6.2 6.2 17.8 17.8M17.8 6.2 6.2 17.8" stroke="#111" stroke-width="2.6" stroke-linecap="round"></path></svg></span><span class="dv-label">Inspiration</span></div>
+            <div class="dv-body" aria-hidden="true"><div class="dv-tile dv-insp-a"></div><div class="dv-tile dv-insp-b"></div></div>
+            <p class="dv-cap">Explore what others are working on, browse finished projects and find new ideas, styles and perspectives to spark your own creativity.</p>
+          </article>
+<article data-k="disc" class="dv-card" aria-label="Discussion">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span class="dv-label">Discussion</span></div><span class="vc-peek" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5c-5 0-9 3.3-9 7.4 0 2.2 1.1 4.1 2.9 5.5L5 20.5l4.6-2.3c.8.2 1.6.3 2.4.3 5 0 9-3.3 9-7.4S17 3.5 12 3.5z" fill="#f2f2f4"/><circle cx="8" cy="11" r="1.3" fill="#111"/><circle cx="12" cy="11" r="1.3" fill="#111"/><circle cx="16" cy="11" r="1.3" fill="#111"/><circle cx="19.6" cy="4.6" r="2.6" fill="#5aa0ff" stroke="#000" stroke-width="1"/></svg></span>
+            <div class="ds-ui" aria-hidden="true">
+              <div class="ds-compose">
+                <div class="ds-input"><span class="ds-ph">What’s on your mind?</span><span class="ds-typed"></span><span class="ds-caret"></span></div>
+                <div class="ds-tabs"><span class="ds-tab" data-on="1">General</span><span class="ds-tab">Thoughts</span><span class="ds-tab">Brainstorm</span><span class="ds-tab">Debate</span><span class="ds-tab">Help</span></div>
+                <div class="ds-create-wrap"><span class="ds-create">Create</span></div>
+              </div>
+              <div class="ds-side">
+                <div class="ds-post">
+                  <span class="ds-av"></span>
+                  <div class="ds-who"><div class="ds-name">Demetrios</div><div class="ds-meta">@demitheanimator · Just Now</div></div>
+                  <span class="ds-more">•••</span>
+                  <div class="ds-text">What’s your thoughts on Tekni?</div>
+                  <div class="ds-when">Just Now</div>
+                  <div class="ds-rule"></div>
+                  <div class="ds-acts">
+                    <span class="ds-act"><svg viewBox="0 0 24 24" fill="#5aa0ff"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.7 8 3.7 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.5 0 5.5 3.5 4.4 6.7-1.7 4.7-9.2 9.3-9.2 9.3z"/></svg><span class="ds-likes">0</span></span>
+                    <span class="ds-act"><svg viewBox="0 0 24 24" fill="#d8d8dc"><path d="M21 12a8.5 8.5 0 0 1-12.4 7.6L3.5 21l1.4-4.7A8.5 8.5 0 1 1 21 12z"/></svg><span class="ds-comments">0</span></span>
+                    <span class="ds-act"><svg viewBox="0 0 24 24" fill="#d8d8dc"><path d="M12 3l8 8.5h-5V21H9v-9.5H4z" stroke="#d8d8dc" stroke-width="1" stroke-linejoin="round"/></svg><span>0</span></span>
+                    <span class="ds-act"><svg viewBox="0 0 24 24" fill="#d8d8dc"><path d="M14 4l8 8-8 8v-4.5c-5.5 0-9 1.8-11.5 5.5.6-6.5 4.6-11.4 11.5-12.4z" stroke="#d8d8dc" stroke-width="1" stroke-linejoin="round"/></svg><span class="ds-shares">0</span></span>
+                    <span class="ds-act ds-save"><svg viewBox="0 0 24 24" fill="#d8d8dc"><path d="M6 3.5h12v17l-6-4.2-6 4.2z" stroke="#d8d8dc" stroke-width="1" stroke-linejoin="round"/></svg></span>
+                  </div>
+                </div>
+                <span class="ds-reply ds-r1">Share Resources</span>
+                <span class="ds-reply ds-r2">Get Advice</span>
+                <span class="ds-reply ds-r3">Learn</span>
+                <span class="ds-reply ds-r4">Ask Questions</span>
+              </div>
+            </div>
+            <p class="dv-cap">A space for the creative community to connect, exchange ideas and ask questions.</p>
+          </article>
+<article data-k="collab" class="dv-card dv-card-collab" aria-label="Collaboration">
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><rect x="2.5" y="6" width="5" height="12" rx="2.5"/><rect x="9.5" y="3" width="5" height="18" rx="2.5"/><rect x="16.5" y="5" width="5" height="10" rx="2.5"/></svg></span><span class="dv-label">Collaboration</span></div><span class="vc-peek" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><circle cx="9" cy="7.5" r="3.6"/><path d="M1.8 20c0-4 3.2-7 7.2-7s7.2 3 7.2 7z"/><circle cx="17" cy="8.5" r="3"/><path d="M15.6 13.3c.5-.1 1-.2 1.4-.2 3.3 0 5.6 2.6 5.6 5.9h-5.2c0-2.2-.7-4.2-1.8-5.7z"/></svg></span>
+            <div class="cb-ui" aria-hidden="true">
+              <svg class="cb-flow" viewBox="0 0 980 640" aria-hidden="true"><g fill="none" stroke="#5a5a5e" stroke-width="2"><rect vector-effect="non-scaling-stroke" x="130" y="96" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="210" y="170" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="104" y="244" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="190" y="318" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M268.0,154 A7,7 0 0 1 275.0,161 L275.0,163 A7,7 0 0 1 268.0,170 L304.0,170 A7,7 0 0 1 297.0,163 L297.0,161 A7,7 0 0 1 304.0,154 Z"/><path vector-effect="non-scaling-stroke" d="M255.0,228 A7,7 0 0 1 262.0,235 L262.0,237 A7,7 0 0 1 255.0,244 L291.0,244 A7,7 0 0 1 284.0,237 L284.0,235 A7,7 0 0 1 291.0,228 Z"/><path vector-effect="non-scaling-stroke" d="M245.0,302 A7,7 0 0 1 252.0,309 L252.0,311 A7,7 0 0 1 245.0,318 L281.0,318 A7,7 0 0 1 274.0,311 L274.0,309 A7,7 0 0 1 281.0,302 Z"/><g class="cb-anim"><rect vector-effect="non-scaling-stroke" x="104" y="392" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M245.0,376 A7,7 0 0 1 252.0,383 L252.0,385 A7,7 0 0 1 245.0,392 L281.0,392 A7,7 0 0 1 274.0,385 L274.0,383 A7,7 0 0 1 281.0,376 Z"/></g></g><g fill="#141415"><rect vector-effect="non-scaling-stroke" x="130" y="96" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="210" y="170" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="104" y="244" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="190" y="318" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M268.0,154 A7,7 0 0 1 275.0,161 L275.0,163 A7,7 0 0 1 268.0,170 L304.0,170 A7,7 0 0 1 297.0,163 L297.0,161 A7,7 0 0 1 304.0,154 Z"/><path vector-effect="non-scaling-stroke" d="M255.0,228 A7,7 0 0 1 262.0,235 L262.0,237 A7,7 0 0 1 255.0,244 L291.0,244 A7,7 0 0 1 284.0,237 L284.0,235 A7,7 0 0 1 291.0,228 Z"/><path vector-effect="non-scaling-stroke" d="M245.0,302 A7,7 0 0 1 252.0,309 L252.0,311 A7,7 0 0 1 245.0,318 L281.0,318 A7,7 0 0 1 274.0,311 L274.0,309 A7,7 0 0 1 281.0,302 Z"/><rect vector-effect="non-scaling-stroke" x="273.0" y="150" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="273.0" y="168" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="260.0" y="224" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="260.0" y="242" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="250.0" y="298" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="250.0" y="316" width="26" height="6"/><g class="cb-anim"><rect vector-effect="non-scaling-stroke" x="104" y="392" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M245.0,376 A7,7 0 0 1 252.0,383 L252.0,385 A7,7 0 0 1 245.0,392 L281.0,392 A7,7 0 0 1 274.0,385 L274.0,383 A7,7 0 0 1 281.0,376 Z"/><rect vector-effect="non-scaling-stroke" x="250.0" y="372" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="250.0" y="390" width="26" height="6"/></g></g></svg><span class="cb-stage" style="left:calc(var(--u)*154);top:calc(var(--u)*96)">Brainstorm</span><span class="cb-stage" style="left:calc(var(--u)*234);top:calc(var(--u)*170)">Sketch</span><span class="cb-stage" style="left:calc(var(--u)*128);top:calc(var(--u)*244)">Model</span><span class="cb-stage" style="left:calc(var(--u)*214);top:calc(var(--u)*318)">Rig</span><span class="cb-stage cb-anim" style="left:calc(var(--u)*128);top:calc(var(--u)*392)">Animation</span><span class="cb-add" style="left:calc(var(--u)*104);top:calc(var(--u)*392)"><svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f4" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add stage</span><span class="cb-new" style="left:calc(var(--u)*104);top:calc(var(--u)*392)"><span class="cb-new-ph">Stage name</span><span class="cb-new-t"></span><span class="ds-caret cb-new-c"></span></span>
+              <div class="cb-right">
+                <p class="cb-h">Keep your projects private or publish them to the wider creative community.</p><p class="cb-h">Exchange feedback, track progress and keep everyone on the same page.</p><p class="cb-h">Keep all important project<br>conversations in one place.</p><p class="cb-h">Manage project activity, see who’s working<br>on what and stay up to date.</p>
+                <div class="cb-tabs"><span class="cb-pill"></span><span class="cb-tab">Project</span><span class="cb-tab">Feedback</span><span class="cb-tab">Discussions</span><span class="cb-tab">Activity</span></div>
+                <div class="cb-panel"><div class="cb-pane" data-i="0">
+  <div class="cb-box cb-intro"><div class="cb-k">INTRODUCTION</div><div class="cb-v">Team animation project- short film</div><span class="cb-edit"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M3 17.3V21h3.7L17.8 9.9l-3.7-3.7zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7z"/></svg>Edit</span></div>
+  <div class="cb-box cb-status"><div class="cb-k">STATUS</div><div class="cb-grid"><span class="cb-cell"><span>To do</span><b class="cb-todo">1</b></span><span class="cb-cell"><span>In progress</span><b class="cb-prog">1</b></span><span class="cb-cell"><span>In review</span><b class="cb-rev">1</b></span><span class="cb-cell"><span>Changes</span><b class="">1</b></span><span class="cb-cell"><span>Approved</span><b class="">1</b></span></div></div>
+</div>
+<div class="cb-pane" data-i="1">
+  <div class="cb-filt"><span data-on="1">Open</span><span>Resolved</span><span>All</span></div>
+  <div class="cb-msg cb-pop">
+    <div class="cb-row"><span class="cb-av"></span><span class="cb-n">Demetrios</span><span class="cb-g">just now</span><span class="cb-dots">•••</span></div>
+    <div class="cb-in"><span class="cb-tag">v1</span><div class="cb-t">Can we get a new iteration of this?</div>
+      <div class="cb-acts"><span><svg viewBox="0 0 24 24" fill="#c8c8cc"><path d="M12 2l4 10-4 10-4-10z"/></svg>Go to</span><span>Reply</span><span><svg viewBox="0 0 24 24" fill="none" stroke="#c8c8cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>Resolve</span></div></div>
+  </div>
+</div>
+<div class="cb-pane" data-i="2">
+  <div class="cb-dhead"><svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>Animation- Short Film</span><svg class="cb-bin" viewBox="0 0 24 24" fill="#a3a3a6"><path d="M9 3h6l1 2h4v2H4V5h4zM6 9h12l-1 12H7z"/></svg></div>
+  <div class="cb-msg cb-pop"><div class="cb-row"><span class="cb-av"></span><span class="cb-n">Abi</span><span class="cb-g">just now</span></div><div class="cb-in cb-t">Hey, are you working on this?</div></div>
+</div>
+<div class="cb-pane" data-i="3">
+  <div class="cb-act cb-pop"><span class="cb-av"></span><span><span class="cb-n">Abi</span> <span class="cb-g">uploaded</span> <span class="cb-n">Sketch v1</span> <span class="cb-g">just now</span></span></div>
+  <div class="cb-act cb-pop"><span class="cb-av"></span><span><span class="cb-n">Demetrios</span> <span class="cb-g">commented</span> <span class="cb-n">Sketch v1</span> <span class="cb-g">just now</span></span></div>
+</div></div>
+              </div>
+            </div>
+            <p class="dv-cap cb-cap">Create shared workspaces for your projects or collaborations.</p><p class="dv-cap cb-cap">Work together, every step of the way.</p><p class="dv-cap cb-cap">Discuss project ideas, share your vision, align on creative direction.</p><p class="dv-cap cb-cap">Stay up to date with progress,<br>updates and changes as they happen.</p>
+            <p class="dv-cap cb-cap0">Working on a group project or creative collaboration?</p>
+          </article>
+<article data-k="mood" class="dv-card dv-card-mood" aria-label="Moodboard">
+            <div class="vc-dots" aria-hidden="true"></div>
+            <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4" aria-hidden="true"><circle cx="12" cy="6.5" r="4.2"></circle><circle cx="17.3" cy="10.4" r="4.2"></circle><circle cx="15.3" cy="16.6" r="4.2"></circle><circle cx="8.7" cy="16.6" r="4.2"></circle><circle cx="6.7" cy="10.4" r="4.2"></circle><circle cx="12" cy="12" r="4"></circle></svg></span><span class="dv-label">Moodboard</span></div>
+            
+            <div class="vc-mbimg" aria-hidden="true"><div class="dv-ghost-img"></div><div class="dv-ghost-meta"><div class="dv-ghost-title">Image xxxx</div></div></div>
+            <div class="dv-mb-ui" aria-hidden="true">
+              <div class="dv-mb-seg"><span class="dv-mb-pill"></span><span class="dv-mb-opt" data-on="1"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0z"></path></svg>Personal</span><span class="dv-mb-opt" data-on="0"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.6"></circle><circle cx="17" cy="9" r="2.8"></circle><path d="M2 20a7 7 0 0 1 14 0z"></path><path d="M15.5 20a8.5 8.5 0 0 0-2.2-5.6A5.5 5.5 0 0 1 22.5 20z"></path></svg>Collab</span><span class="dv-mb-opt" data-on="0"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7.5" r="3.4"></circle><circle cx="5" cy="9.5" r="2.5"></circle><circle cx="19" cy="9.5" r="2.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0z"></path><path d="M0.5 19a4.5 4.5 0 0 1 6.2-4.2A8 8 0 0 0 4.6 19z"></path><path d="M23.5 19a4.5 4.5 0 0 0-6.2-4.2 8 8 0 0 1 2.1 4.2z"></path></svg>Group</span></div>
+              <div class="dv-mb-note dv-n-blue">Save images, references and creative ideas.</div>
+              <div class="dv-mb-note dv-n-green">Add notes and organise your thoughts all in one place.</div>
+              <div class="dv-mb-note dv-n-pink">Keep your moodboards private for your own projects.</div>
+              <div class="dv-mb-note dv-n-lilac">Collaborate with others to take your ideas further.</div>
+              <div class="dv-mb-tools"><div class="dv-mb-bar"></div><div class="dv-mb-row"><svg class="dv-pencil" viewBox="0 0 44 92" aria-hidden="true"><defs><linearGradient id="vcWood" x1="0" x2="1"><stop offset="0" stop-color="#c9a877"></stop><stop offset=".45" stop-color="#f1dcb2"></stop><stop offset="1" stop-color="#b8935f"></stop></linearGradient><linearGradient id="vcLead" x1="0" x2="1"><stop offset="0" stop-color="#1c1c1e"></stop><stop offset=".5" stop-color="#4a4a4e"></stop><stop offset="1" stop-color="#1c1c1e"></stop></linearGradient><linearGradient id="vcBand" x1="0" x2="1"><stop offset="0" stop-color="#3b3d42"></stop><stop offset=".45" stop-color="#8d9098"></stop><stop offset="1" stop-color="#2e3034"></stop></linearGradient></defs><path d="M22 2 30 22H14z" fill="url(#vcLead)"></path><path d="M14 22h16l10 46H4z" fill="url(#vcWood)"></path><path d="M14 22 4 68M30 22l10 46M22 22v46" stroke="#a88456" stroke-width=".8" opacity=".55"></path><rect x="4" y="68" width="36" height="22" rx="2" fill="url(#vcBand)"></rect><path d="M4 74h36M4 80h36" stroke="#2a2b2f" stroke-width="1.2" opacity=".7"></path></svg><span class="dv-mb-sticky"></span><div class="dv-mb-icons"><svg viewBox="0 0 24 24" fill="#ffffff"><path d="M4 3.5h16v4.5h-5.6V21H9.6V8H4z"></path></svg><svg viewBox="0 0 24 24" fill="#ffffff"><path d="M7 2.5 11.6 10.5H2.4z"></path><circle cx="17.5" cy="7" r="4.3"></circle><rect x="2.8" y="13" width="8.4" height="8.4" rx="1.6"></rect><rect x="13.2" y="13" width="8.4" height="8.4" rx="4.2"></rect></svg><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19c2.5-1 5-4.5 6.5-8.5S10 4 8.5 5 6 12 8 16.5s5.5 1.5 7.5-2.5 2.5-7.5 4.5-6.5-1 6-2.5 7.5 1 3 3 2.5"></path></svg><svg viewBox="0 0 24 24" fill="#ffffff"><path d="m15.6 2.4 6 6-8.8 8.8-4.2.2.2-4.2z"></path><path d="M7.6 14.6 9.4 16.4 7.2 18.6l-2.8-.9z"></path><path d="M2.5 21.5c2-1.6 3.6-1.6 5 0s3 1.6 5 0" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"></path></svg><svg viewBox="0 0 24 24" fill="#ffffff"><path d="M3 4.5A2.5 2.5 0 0 1 5.5 2h3A2.5 2.5 0 0 1 11 4.5v15A2.5 2.5 0 0 1 8.5 22h-3A2.5 2.5 0 0 1 3 19.5z"></path><path d="M13 9c4-2.5 9 .5 8.5 6-.4 4-3.6 6.6-7 7l-1.5-.2z"></path></svg><svg viewBox="0 0 24 24" fill="#ffffff"><path d="M2 6a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3zm4 12h12l-4-5.5-3 3.5-1.6-1.8z"></path><circle cx="16.5" cy="8" r="1.9" fill="#141416"></circle></svg></div><div class="dv-mb-pair"><svg viewBox="0 0 24 24" fill="#ffffff"><path d="M5 3h14v14l-7 4.5L5 17z"></path></svg><svg viewBox="0 0 24 24" fill="#8e8e93"><rect x="7.5" y="7.5" width="14" height="14" rx="3"></rect><path d="M4 16.5V5.5A3 3 0 0 1 7 2.5h10v2.6H7.6A1.1 1.1 0 0 0 6.5 6.2v10.3z"></path></svg></div></div></div>
+            </div>
+            <p class="dv-cap">Bring your ideas together and build visual collections of inspiration.</p>
+          </article>
+    </div></div>
   </div>
 </section>
 
