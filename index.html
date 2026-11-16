@@ -17,7 +17,7 @@
 <script src="./connect-scroll.js?v=4d856f1320"></script>
 <script src="./customise-scroll.js?v=6b64a6c725"></script>
 <script src="./discover-scroll.js?v=f8383738e3"></script>
-<script src="./finalpost-scroll.js?v=d375fe7b24"></script>
+<script src="./finalpost-scroll.js?v=406ac57f1b"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -94,11 +94,11 @@
   .vc-labs{position:relative;height:clamp(38px,2.85vw,70px)}
   .vc-lab{position:absolute;left:0;top:0;display:flex;align-items:center;white-space:nowrap;height:100%;padding:0 clamp(20px,2.35vw,56px);border-radius:clamp(7px,0.4vw,10px);border:1px solid rgba(255,255,255,0.12);background:#0b0b0b;color:#f2f2f4;font-size:clamp(16px,1.45vw,36px);opacity:0}
   .vc-h{margin:clamp(12px,1.1vw,26px) 0 0 0.6vw;font-size:clamp(22px,2.15vw,52px);font-weight:600;line-height:1.12;letter-spacing:-0.01em;color:#fff}
-  .vc-right{position:absolute;left:74vw;top:54%;width:22vw;transform:translateY(-50%);z-index:2}
+  .vc-right{position:absolute;left:73.5vw;top:54%;width:24vw;transform:translateY(-50%);z-index:2}
   .vc-r{position:absolute;left:0;top:0;width:100%;opacity:0;transform:translateY(-50%)}
   .vc-d{margin:0;font-size:clamp(15px,1.45vw,36px);font-weight:300;line-height:1.2;color:#e4e4e6}
   .vc-chips{display:flex;flex-wrap:wrap;gap:clamp(8px,0.65vw,16px);margin-top:clamp(14px,1.4vw,34px)}
-  .vc-chip{display:inline-flex;align-items:center;height:clamp(32px,2.2vw,54px);padding:0 clamp(14px,1.55vw,38px);border-radius:clamp(6px,0.35vw,9px);border:1px solid rgba(255,255,255,0.12);background:#0b0b0b;color:#f2f2f4;font-size:clamp(13px,1.15vw,28px);opacity:0;white-space:nowrap}
+  .vc-chip{display:inline-flex;align-items:center;height:clamp(32px,2.2vw,54px);padding:0 clamp(14px,1.55vw,38px);border-radius:clamp(6px,0.35vw,9px);border:1px solid rgba(255,255,255,0.12);background:#0b0b0b;color:#f2f2f4;font-size:clamp(13px,1.15vw,28px);white-space:nowrap}
   .vc-col{position:absolute;top:54%;--u:min(calc(42.5vw / 980),calc(78vh / 840));width:calc(var(--u) * 980);left:calc(49vw - var(--u) * 490);height:0}
   .vc-col *{box-sizing:border-box}
   .vc-stack{position:absolute;left:0;top:0;width:100%;height:0}
@@ -110,14 +110,24 @@
   .vc-dots{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:radial-gradient(circle,#2c2c2e calc(var(--u)*1.4),transparent calc(var(--u)*1.9));background-size:calc(var(--u)*40) calc(var(--u)*40);background-position:calc(var(--u)*4) calc(var(--u)*4)}
   .vc-mbimg{position:absolute;left:calc(var(--u)*108);top:calc(var(--u)*139);width:calc(var(--u)*321);padding:calc(var(--u)*15) calc(var(--u)*15) calc(var(--u)*13.5);border:1px solid rgba(255,255,255,0.13);border-radius:calc(var(--u)*10);background:#000}
   .vc-mbimg .dv-ghost-img{height:calc(var(--u)*200);border-radius:calc(var(--u)*8)}
-  /* Discussion: composer centred and larger; the post takes its place once created */
-  #vc .ds-input{left:calc(var(--u)*185);top:calc(var(--u)*170);width:calc(var(--u)*610);height:calc(var(--u)*92);font-size:calc(var(--u)*28);padding:0 calc(var(--u)*38);border-radius:calc(var(--u)*14)}
-  #vc .ds-tabs{left:calc(var(--u)*185);top:calc(var(--u)*280);width:calc(var(--u)*610);height:calc(var(--u)*72);font-size:calc(var(--u)*22);padding:0 calc(var(--u)*26) 0 calc(var(--u)*10);border-radius:calc(var(--u)*14)}
-  #vc .ds-tab{height:calc(var(--u)*50);padding:0 calc(var(--u)*20);border-radius:calc(var(--u)*12)}
-  #vc .ds-create-wrap{left:calc(var(--u)*640);top:calc(var(--u)*372);width:calc(var(--u)*160);height:calc(var(--u)*80)}
-  #vc .ds-create{width:calc(var(--u)*140);height:calc(var(--u)*56);font-size:calc(var(--u)*23);border-radius:calc(var(--u)*16)}
-  #vc .ds-side{left:calc(var(--u)*200);top:calc(var(--u)*140);width:calc(var(--u)*580);transform-origin:50% 0}
-  #vc .ds-post{height:calc(var(--u)*250)}
+  /* Discussion: composer centred and larger (no Create button); the post takes its place once created */
+  #vc .ds-input{left:calc(var(--u)*190);top:calc(var(--u)*174);width:calc(var(--u)*600);height:calc(var(--u)*91);font-size:calc(var(--u)*27);padding:0 calc(var(--u)*38);border-radius:calc(var(--u)*14)}
+  #vc .ds-tabs{left:calc(var(--u)*190);top:calc(var(--u)*285);width:calc(var(--u)*600);height:calc(var(--u)*67);font-size:calc(var(--u)*21.5);padding:0 calc(var(--u)*24) 0 calc(var(--u)*10);border-radius:calc(var(--u)*14)}
+  #vc .ds-tab{height:calc(var(--u)*47);padding:0 calc(var(--u)*17);border-radius:calc(var(--u)*11)}
+  #vc .ds-create-wrap{display:none}
+  #vc .ds-side{left:calc(var(--u)*173);top:calc(var(--u)*121);width:calc(var(--u)*639);height:calc(var(--u)*313);transform-origin:50% 0}
+  #vc .ds-post{height:calc(var(--u)*313);border-radius:calc(var(--u)*36);border:1px solid rgba(255,255,255,0.12);background:#000;overflow:hidden}
+  #vc .ds-av{left:calc(var(--u)*38);top:calc(var(--u)*31);width:calc(var(--u)*62);height:calc(var(--u)*62);border-radius:calc(var(--u)*14)}
+  #vc .ds-who{left:calc(var(--u)*121);top:calc(var(--u)*36);line-height:1.35}
+  #vc .ds-name{font-size:calc(var(--u)*20)}
+  #vc .ds-meta{font-size:calc(var(--u)*19)}
+  #vc .ds-more{right:calc(var(--u)*46);top:calc(var(--u)*48);font-size:calc(var(--u)*20)}
+  #vc .ds-text{left:calc(var(--u)*38);top:calc(var(--u)*116);font-size:calc(var(--u)*22)}
+  #vc .ds-when{left:calc(var(--u)*38);top:calc(var(--u)*171);font-size:calc(var(--u)*19)}
+  #vc .ds-rule{left:0;right:0;top:calc(var(--u)*229);background:rgba(255,255,255,0.12)}
+  #vc .ds-acts{left:calc(var(--u)*42);right:calc(var(--u)*46);top:calc(var(--u)*255);height:calc(var(--u)*34);gap:calc(var(--u)*30);font-size:calc(var(--u)*20)}
+  #vc .ds-act{gap:calc(var(--u)*10)}
+  #vc .ds-act svg{width:calc(var(--u)*25);height:calc(var(--u)*25)}
   #vc .dv-mb-tools{top:calc(var(--u)*438)}
   #vc .dv-mb-seg{left:calc(var(--u)*380)}
   #vc .cb-right{top:calc(var(--u)*42)}

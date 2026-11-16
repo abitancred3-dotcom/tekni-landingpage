@@ -139,12 +139,6 @@
       r.style.visibility = w > 0.001 ? 'visible' : 'hidden';
       r.style.marginTop = ((1 - w) * 14).toFixed(2) + 'px';
       const p = prog[kk] || 0;
-      r.querySelectorAll('.vc-chip').forEach((c, i) => {
-        const at = kk === 'disc' ? REPLIES[i] : 0.12 + i * 0.14;
-        const e = seg(p, at, at + 0.07);
-        c.style.opacity = smooth(e).toFixed(3);
-        c.style.transform = 'translate3d(0,' + ((1 - smooth(e)) * 10).toFixed(2) + 'px,0) scale(' + (0.9 + 0.1 * smooth(e)).toFixed(4) + ')';
-      });
     });
   }
 
