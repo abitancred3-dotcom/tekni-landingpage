@@ -38,11 +38,22 @@
   // with its neighbours collapsed to header bars above and below. Scrolling rolls the stack up through the
   // centre: the open card's content fades, it shrinks to a bar and lifts, while the bar below grows open.
   const HC = 98, GAP = 30;
-  const SEQ = [['disc', 1, 1.7], ['insp', 2, 1.0], ['mood', 3, 1.5], ['collab', 4, 3.0]];
+  const SEQ = [['disc', 1, 1.7], ['insp', 2, 1.3], ['mood', 3, 2.0], ['collab', 4, 3.0]];
   const LEAD = 0.3, T = 0.8, TAIL = 0.35;
   const TOTAL = LEAD + SEQ.reduce((a, s) => a + s[2], 0) + T * (SEQ.length - 1) + TAIL;
   const REPLIES = [0.56, 0.63, 0.70, 0.77];
-  const CONTENT = '.ds-ui,.dv-body,.dv-mb-ui,.cb-ui,.vc-mbimg,.vc-dots';
+  const CONTENT = '.ds-ui,.dv-body,.dv-mb-ui,.cb-ui,.vc-mbimg,.vc-dotcv';
+  // where each card's hold starts on the raw timeline
+  const START = {};
+  { let t = LEAD; SEQ.forEach(([k, , len], i) => { START[k] = t; t += len + (i < SEQ.length - 1 ? T : 0); }); }
+  // Inspiration -> Moodboard drag: the middle image is grabbed while Inspiration is open, carried while the
+  // stack rolls on, and dropped onto the Moodboard once it has opened (same beats as the horizontal row)
+  const D_IN = START.insp + 0.25, D_PRESS = START.insp + 0.6, D_LIFT = START.insp + 0.8;
+  const D_DROP = START.mood + 0.28, D_SETTLE = START.mood + 0.4, MOOD_FROM = START.mood + 0.45;
+  const SRC = { x: 368, y: 192, w: 244, h: 268 }, DST = { x: 108, y: 139, w: 321 }, IMG_H = 200, PAD = 15, GRAB = { x: 46, y: 34 };
+  const lerp = (p, q, t) => p + (q - p) * t;
+  const sine = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
+  const vdots = { hover: 0, cx: 0, cy: 0, still: false };
   function timeline(raw) {
     const prog = { disc: 0, collab: 0, mood: 0, insp: 0 };
     let t = LEAD;
@@ -95,10 +106,10 @@
     const f = B.d - A.d > 1e-6 ? clamp(-A.d / (B.d - A.d), 0, 1) : 0;
     const anchor = A.c + (B.c - A.c) * f;
     const S = window.__dvScenes;
-    const byK = {};
+    const byK = {}, posK = {};
     items.forEach(it => {
       const el = it.el, st = el.style, ad = Math.abs(it.d), kk = el.dataset.k;
-      byK[kk] = it.e;
+      byK[kk] = it.e; posK[kk] = { x: (WO - it.w) / 2, y: it.top - anchor, e: it.e };
       const op = 1 - smooth(clamp((ad - 1) / 0.55, 0, 1));
       st.width = U(it.w); st.height = U(it.h);
       st.transform = 'translate3d(' + U((WO - it.w) / 2) + ',' + U(it.top - anchor) + ',0)';
@@ -118,15 +129,18 @@
           if (comp && !portrait) comp.style.opacity = ((parseFloat(comp.style.opacity) || 0) * (1 - smooth(seg(prog.disc, 0.44, 0.5)))).toFixed(3);
         }
         else if (kk === 'collab') S.collabScene(prog.collab, el);
-        else if (kk === 'mood') S.moodScene(prog.mood, el);
+        else if (kk === 'mood') S.moodScene(seg(shown, MOOD_FROM, START.mood + 2.0), el);
       }
       if (kk === 'insp') {
-        const ip = prog.insp, ta = el.querySelector('.dv-insp-a'), tb = el.querySelector('.dv-insp-b');
-        const w = Math.sin(Math.PI * ip);
-        if (ta) ta.style.transform = 'translate3d(' + U(150) + ',' + U(-10 * w - 40) + ',0) rotate(' + (7 - 3 * w).toFixed(2) + 'deg)';
-        if (tb) tb.style.transform = 'translate3d(' + U(200 + 14 * w) + ',' + U(-6 * w) + ',0) rotate(' + (-4 + 3 * w).toFixed(2) + 'deg)';
+        const t2 = el.querySelector('.vc-t2');
+        if (t2) t2.style.opacity = shown >= D_PRESS ? '0' : '1';
+      }
+      if (kk === 'mood') {
+        const mb = el.querySelector('.vc-mbimg');
+        if (mb) mb.style.visibility = shown >= D_SETTLE && cv > 0.001 ? 'visible' : 'hidden';
       }
     });
+    dragScene(sec, shown, posK, HO);
     // left label and right-hand description + chips follow whichever card is open
     sec.querySelectorAll('.vc-lab').forEach(l => {
       const w = smooth(seg(byK[l.dataset.k] || 0, 0.5, 1));
@@ -142,10 +156,99 @@
     });
   }
 
+  function dragScene(sec, raw, posK, HO) {
+    const ghost = sec.querySelector('.vc-ghost'), cursor = sec.querySelector('.vc-cursor');
+    const mood = sec.querySelector('.vc-stack > .dv-card[data-k="mood"]');
+    if (!ghost || !cursor || !posK.insp || !posK.mood) return;
+    const sx = SRC.x, sy = -HO / 2 + SRC.y;                       // the tile while Inspiration is open
+    const tx = posK.mood.x + DST.x, ty = posK.mood.y + DST.y;      // the landing spot, wherever the Moodboard is now
+    const press = seg(raw, D_PRESS, D_LIFT), picked = raw >= D_PRESS;
+    const drag = sine(seg(raw, D_LIFT, D_DROP)), settle = seg(raw, D_SETTLE - 0.08, D_SETTLE);
+    const m = smooth(seg(drag, 0, 0.35));
+    const gx = lerp(sx, tx, drag), gy = lerp(sy, ty, drag) - 70 * Math.sin(Math.PI * drag);
+    const lift = smooth(press) * (1 - smooth(settle));
+    const w = lerp(SRC.w, DST.w, m), imgH = lerp(SRC.h, IMG_H, m), pad = PAD * m;
+    const rot = 3 * Math.sin(Math.PI * drag);
+    const dip = 1 - 0.045 * Math.sin(Math.PI * Math.min(1, press * 1.5));
+    const showG = picked && raw < D_SETTLE;
+    ghost.style.display = showG ? 'block' : 'none';
+    if (showG) {
+      ghost.style.width = U(w);
+      ghost.style.padding = U(pad) + ' ' + U(pad) + ' ' + U(pad * 0.9);
+      ghost.style.transform = 'translate3d(' + U(gx) + ',' + U(gy) + ',0) rotate(' + rot.toFixed(2) + 'deg) scale(' + (dip * (1 + 0.04 * lift)).toFixed(4) + ')';
+      ghost.style.borderColor = 'rgba(255,255,255,' + (0.13 * m).toFixed(3) + ')';
+      ghost.style.background = 'rgba(0,0,0,' + m.toFixed(3) + ')';
+      ghost.style.boxShadow = '0 ' + U(8 + 28 * lift) + ' ' + U(24 + 46 * lift) + ' rgba(0,0,0,' + (0.3 + 0.4 * lift).toFixed(3) + ')';
+      const img = ghost.firstElementChild, meta = ghost.lastElementChild;
+      if (img) { img.style.height = U(imgH); img.style.borderRadius = U(lerp(10, 8, m)); }
+      if (meta) { meta.style.opacity = smooth(seg(m, 0.5, 1)).toFixed(3); meta.style.height = U(m * 34); }
+    }
+    // white hand with the profile badge: glides onto the middle image, grabs it, carries it, lets go, drifts off
+    const cIn = smooth(seg(raw, D_IN, D_PRESS)), cOut = smooth(seg(raw, D_SETTLE - 0.02, D_SETTLE + 0.06));
+    let cx, cy;
+    if (!picked) { cx = lerp(sx + SRC.w * 0.95, sx + GRAB.x, cIn); cy = lerp(sy + SRC.h * 0.95, sy + GRAB.y, cIn); }
+    else { cx = gx + GRAB.x + 34 * cOut; cy = gy + GRAB.y + 26 * cOut; }
+    const show = cIn * (1 - cOut) * (raw < D_PRESS ? smooth(seg(posK.insp.e, 0.8, 1)) : 1);
+    cursor.style.display = show > 0.001 ? 'block' : 'none';
+    cursor.style.opacity = show.toFixed(3);
+    const squeeze = raw >= D_PRESS && raw < D_LIFT ? 1 - 0.1 * Math.sin(Math.PI * press) : 1;
+    cursor.style.transform = 'translate3d(' + U(cx) + ',' + U(cy) + ',0) scale(' + squeeze.toFixed(3) + ')';
+    // the board lights up while the image hovers over it, then calms once it's dropped
+    const over = picked ? smooth(seg(raw, D_DROP - 0.4, D_DROP - 0.12)) * smooth(seg(posK.mood.e, 0.6, 1)) * (1 - smooth(seg(raw, D_DROP, D_DROP + 0.06))) : 0;
+    vdots.hover = over; vdots.cx = cx - posK.mood.x; vdots.cy = cy - posK.mood.y;
+    if (mood) mood.style.borderColor = over > 0.01 ? 'rgba(255,140,190,' + (0.13 + 0.55 * over).toFixed(3) + ')' : '';
+    vdots.still = false;
+  }
+
+  // dotted moodboard background, with the pulsing magnet effect around the held image
+  function drawVcDots(now) {
+    const sec = document.getElementById('vc');
+    const cv = sec && sec.querySelector('.vc-dotcv');
+    if (!cv) return;
+    const W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H) return;
+    const col = sec.querySelector('.vc-col');
+    const portrait = window.matchMedia && window.matchMedia('(max-aspect-ratio: 1/1)').matches;
+    const u = col ? col.getBoundingClientRect().width / (portrait ? 880 : 980) : 1;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); vdots.still = false; }
+    const hv = vdots.hover;
+    if (hv < 0.001 && vdots.still) return;
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, H);
+    const S = 40 * u, rBase = 1.35 * u;
+    g.fillStyle = '#2c2c2e';
+    for (let y = S * 0.6; y < H; y += S) for (let x = S * 0.6; x < W; x += S) { g.beginPath(); g.arc(x, y, rBase, 0, 6.2832); g.fill(); }
+    if (hv > 0.001) {
+      const px = vdots.cx * u, py = vdots.cy * u, t = (now || 0) / 1000;
+      const Rmax = 420 * u, R = Rmax * (0.35 + 0.65 * hv), edge = 140 * u;
+      const s2 = S / 2, rPink = 2.1 * u;
+      const period = 1.6, ring = ((t % period) / period) * (R + edge), ring2 = (((t + period / 2) % period) / period) * (R + edge);
+      const band = 46 * u;
+      for (let y = s2 * 0.2; y < H; y += s2) {
+        for (let x = s2 * 0.2; x < W; x += s2) {
+          const dx = x - px, dy = y - py, d = Math.hypot(dx, dy);
+          if (d > R + edge) continue;
+          const k = hv * (d <= R ? 1 : 1 - (d - R) / edge);
+          if (k <= 0.02) continue;
+          const wv = Math.max(0, 1 - Math.abs(d - ring) / band, 1 - Math.abs(d - ring2) / band);
+          const ux = d > 0.001 ? dx / d : 0, uy = d > 0.001 ? dy / d : 0;
+          const shift = wv * 5 * u, r = rPink * (0.55 + 0.45 * k);
+          if (wv > 0.05) { g.fillStyle = 'rgba(243,196,212,' + (0.35 * wv * k).toFixed(3) + ')'; g.beginPath(); g.arc(x - ux * shift * 0.6, y - uy * shift * 0.6, r * 0.9, 0, 6.2832); g.fill(); }
+          g.fillStyle = 'rgba(243,196,212,' + (0.25 + 0.75 * k).toFixed(3) + ')';
+          g.beginPath(); g.arc(x + ux * shift, y + uy * shift, r, 0, 6.2832); g.fill();
+        }
+      }
+    }
+    vdots.still = hv < 0.001;
+  }
+
   function frame(now) {
     requestAnimationFrame(frame);
     topScene();
     vcScene(now);
+    drawVcDots(now);
   }
   requestAnimationFrame(frame);
 })();
