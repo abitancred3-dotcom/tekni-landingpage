@@ -179,11 +179,12 @@
       cx = 500; maxW = 940; cols = 6; capW = 900;
     }
     cap.style.width = 'calc(var(--u) * ' + capW + ')';
-    const capH = cap.offsetHeight / u;
-    const PAD = 20, CAPGAP = 22;
+    cap.style.display = 'none';   // no caption under the screen: the box gets the whole height, centred
+    const capH = 0;
+    const PAD = 20, CAPGAP = 0;
     // the screen box + caption, as one group, is as large as the space allows and
     // vertically centred between the nav and the bottom of the screen
-    const top0 = navB + 36, bot0 = vBot - 72, avail = bot0 - top0;
+    const top0 = navB + 32, bot0 = vBot - 32, avail = bot0 - top0;
     const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
     const s = Math.max(0.2, Math.min((avail - capH - CAPGAP - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.92));
     const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
@@ -199,11 +200,15 @@
 
     // tile grid: one even gap between every tile, one even border on all four sides;
     // plus tile spans the last 3 rows of the last column
-    const B = 1.5, inset = 14, g = 10;
+    const B = 1.5, inset = 14, K = 5;
     const ix = fx + B + inset, iy = fy + B + inset, iw = fw - 2 * (B + inset), ih = fh - 2 * (B + inset);
-    const tw = (iw - (cols - 1) * g) / cols;
-    const rows = portrait ? Math.max(4, Math.round((ih + g) / (tw + g))) : 6;
-    const th = (ih - (rows - 1) * g) / rows;
+    // the fine cube grid fills the inner area exactly (same border on all four sides); the big cells used by the
+    // plus box and the image box are K x K blocks of it, so everything lines up with the cubes
+    const pitch0 = iw / (cols * K);
+    const rows = portrait ? Math.max(4, Math.round(ih / (pitch0 * K))) : 6;
+    const mg = pitch0 * 0.26;
+    const mpx = (iw + mg) / (cols * K), mpy = (ih + mg) / (rows * K);
+    const g = mg, tw = K * mpx - mg, th = K * mpy - mg;
     const X = c => ix + c * (tw + g);
     const Y = r => iy + r * (th + g);
     const gk = cols + 'x' + rows;
@@ -225,9 +230,8 @@
     const ps = pixCv.style;
     ps.left = U(bx); ps.top = U(by); ps.width = U(bw2); ps.height = U(bh2);
     // micro grid: every big cell holds K x K tiny cubes, so the image box and plus still line up with them
-    const K = 5, mpx = (tw + g) / K, mpy = (th + g) / K;
-    const MC = cols * K, MR = Math.round((ih + g) / mpy);
-    L.M = { K, MC, MR, mpx, mpy, mg: Math.min(mpx, mpy) * 0.2, ox: ix - bx, oy: iy - by, bw2, bh2, u, mask: pixelText(MC, MR, portrait) };
+    const MC = cols * K, MR = rows * K;
+    L.M = { K, MC, MR, mpx, mpy, mg, ox: ix - bx, oy: iy - by, bw2, bh2, u, mask: pixelText(MC, MR, portrait) };
     const pr = rows - 3;
     plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
     plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
