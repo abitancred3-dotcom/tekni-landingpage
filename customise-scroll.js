@@ -146,9 +146,9 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 660;
+  const S_END = 640;
   const D = 80;   // the add-image steps run this much later, after the pixel lettering
-  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, menuEl = null, imgEl = null, handleEl = null, imgRow = null;
+  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, panels = [], menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
   window.addEventListener('resize', () => { layoutKey = ''; });
 
@@ -200,7 +200,7 @@
 
     // tile grid: one even gap between every tile, one even border on all four sides;
     // plus tile spans the last 3 rows of the last column
-    const B = 1.5, inset = 14, K = 5;
+    const B = 1.5, inset = 14, K = 6;
     const ix = fx + B + inset, iy = fy + B + inset, iw = fw - 2 * (B + inset), ih = fh - 2 * (B + inset);
     // the fine cube grid fills the inner area exactly (same border on all four sides); the big cells used by the
     // plus box and the image box are K x K blocks of it, so everything lines up with the cubes
@@ -222,6 +222,16 @@
       plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
       grid.appendChild(plusEl);
       buildMenuAndImage(grid);
+      // the plus box / menu / image steps are retired: three panels are drawn out instead
+      [plusEl, menuEl, imgEl, handleEl].forEach(el => { if (el) el.style.display = 'none'; });
+      panels = [0, 1, 2].map(() => {
+        const box = document.createElement('div');
+        box.style.cssText = 'position:absolute;z-index:4;opacity:0;box-sizing:border-box;background:#050505;border:1.5px solid rgba(255,255,255,0.14);transform-origin:0 0;will-change:width,height,opacity';
+        const dot = document.createElement('div');
+        dot.style.cssText = 'position:absolute;z-index:5;opacity:0;box-sizing:border-box;border-radius:50%;background:#0c0c0c;border:2px solid var(--cz-acc);transform:translate(-50%,-50%)';
+        grid.appendChild(box); grid.appendChild(dot);
+        return { box, dot };
+      });
     }
     // corners concentric with the screen frame (frame radius 34, minus border and inset); all tiles share the plus tile's fill
     const TR = U(34 - B - inset);
@@ -232,6 +242,7 @@
     // micro grid: every big cell holds K x K tiny cubes, so the image box and plus still line up with them
     const MC = cols * K, MR = rows * K;
     L.M = { K, MC, MR, mpx, mpy, mg, ox: ix - bx, oy: iy - by, bw2, bh2, u, mask: pixelText(MC, MR, portrait) };
+    L.bx = bx; L.by = by; L.portrait = portrait;
     const pr = rows - 3;
     plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
     plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
@@ -311,51 +322,85 @@
 
     // tiny cubes flip in across the screen, then some light up to spell "Make it your own." in pixels
     drawPixels(L, sv);
-    if (plusEl) {
-      const q = seg(sv - D, 394, 414);
-      plusEl.style.opacity = easeOut(q).toFixed(3);
-      plusEl.style.transform = q < 1 ? 'perspective(700px) rotateY(' + ((1 - easeOut(q)) * -120).toFixed(1) + 'deg) scale(' + (0.85 + 0.15 * easeBack(q)).toFixed(3) + ')' : '';
-      // plus box lights up pink, stays lit while the menu is open
-      const hl = easeOut(seg(sv - D, 418, 430)) * (1 - easeOut(seg(sv - D, 466, 478)));
-      const pc = 'color-mix(in srgb, var(--cz-acc) ' + (hl * 100).toFixed(1) + '%, rgba(255,255,255,0.3))';
-      plusEl.style.borderColor = pc;
-      plusEl.style.borderWidth = hl > 0.01 ? '1.5px' : '';
-      const psvg = plusEl.querySelector('svg');
-      if (psvg) { psvg.style.stroke = 'color-mix(in srgb, var(--cz-acc) ' + (hl * 100).toFixed(1) + '%, #fff)'; psvg.style.strokeWidth = (1.6 + 0.6 * hl).toFixed(2); }
-    }
-    addImageScene(L, sv - D);
+    panelScene(L, sv);
+  }
+
+  // ---------- three panels drawn out with the corner dot ----------
+  // Each panel appears as a small rounded square at its top-left cube, then its corner dot drags it out
+  // smoothly to full size (lined up with the cubes); the outline and dot are pink while it's being drawn.
+  function panelScene(L, sv) {
+    const M = L.M; if (!M || !panels.length) return;
+    const portrait = L.portrait;
+    const N = 3, MC = M.MC, MR = M.MR;
+    const mX = portrait ? 2 : 3, gapC = portrait ? 2 : 3;
+    const pw = Math.floor((MC - 2 * mX - (N - 1) * gapC) / N);
+    const extra = MC - 2 * mX - (N - 1) * gapC - pw * N;
+    const r0 = 2, r1 = MR - 3;
+    const cs = M.mpx - M.mg, ch = M.mpy - M.mg;
+    const X0 = L.bx + M.ox, Y0 = L.by + M.oy;
+    const cellX = c => X0 + c * M.mpx, cellY = r => Y0 + r * M.mpy;
+    const R = Math.min(M.mpx, M.mpy) * 1.05;
+    panels.forEach((p, i) => {
+      const c0 = mX + Math.floor(extra / 2) + i * (pw + gapC), c1 = c0 + pw - 1;
+      const s0 = 470 + i * 40;
+      const a = seg(sv, s0, s0 + 6), d = easeIO(seg(sv, s0 + 6, s0 + 32)), e = smooth(seg(sv, s0 + 32, s0 + 40));
+      const x = cellX(c0), y = cellY(r0);
+      const fullW = cellX(c1) + cs - x, fullH = cellY(r1) + ch - y;
+      const startW = cellX(c0 + 2) + cs - x, startH = cellY(r0 + 2) + ch - y;
+      const w = startW + (fullW - startW) * d, h = startH + (fullH - startH) * d;
+      const bs = p.box.style;
+      bs.left = U(x); bs.top = U(y); bs.width = U(w); bs.height = U(h);
+      bs.borderRadius = U(R);
+      bs.opacity = easeOut(a).toFixed(3);
+      bs.visibility = a > 0 ? 'visible' : 'hidden';
+      bs.transform = a < 1 ? 'scale(' + (0.6 + 0.4 * easeBack(a)).toFixed(4) + ')' : '';
+      bs.borderColor = 'color-mix(in srgb, var(--cz-acc) ' + ((1 - e) * 100).toFixed(1) + '%, rgba(255,255,255,0.14))';
+      bs.borderWidth = (1.5 + 0.5 * (1 - e)).toFixed(2) + 'px';
+      // the dot rides the rounded bottom-right corner; filled pink while dragging, then fades away
+      const ci = R * (1 - Math.SQRT1_2);
+      const ds = p.dot.style, dd = Math.min(M.mpx, M.mpy) * 0.9;
+      ds.width = U(dd); ds.height = U(dd);
+      ds.left = U(x + w - ci); ds.top = U(y + h - ci);
+      const act = seg(sv, s0 + 6, s0 + 9) * (1 - seg(sv, s0 + 29, s0 + 32));
+      ds.opacity = (easeOut(seg(sv, s0 + 3, s0 + 7)) * (1 - e)).toFixed(3);
+      ds.visibility = a > 0 && e < 1 ? 'visible' : 'hidden';
+      ds.background = 'color-mix(in srgb, var(--cz-acc) ' + (act * 100).toFixed(1) + '%, #0c0c0c)';
+      ds.transform = 'translate(-50%,-50%) scale(' + (1 + 0.15 * act).toFixed(3) + ')';
+    });
   }
 
   // ---------- pixel lettering ----------
+  // compact 5-row pixel font, so the line fits on the cube grid in one go
   const GLYPHS = {
-    M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
-    a: ['00000', '00000', '01110', '00001', '01111', '10001', '01111'],
-    k: ['10000', '10000', '10010', '10100', '11000', '10100', '10010'],
-    e: ['00000', '00000', '01110', '10001', '11111', '10000', '01110'],
-    i: ['1', '0', '1', '1', '1', '1', '1'],
-    t: ['010', '010', '111', '010', '010', '010', '001'],
-    y: ['00000', '00000', '10001', '10001', '01111', '00001', '01110'],
-    o: ['00000', '00000', '01110', '10001', '10001', '10001', '01110'],
-    u: ['00000', '00000', '10001', '10001', '10001', '10011', '01101'],
-    r: ['0000', '0000', '1011', '1100', '1000', '1000', '1000'],
-    w: ['00000', '00000', '10001', '10001', '10101', '10101', '01010'],
-    n: ['00000', '00000', '10110', '11001', '10001', '10001', '10001'],
-    '.': ['0', '0', '0', '0', '0', '0', '1'],
+    M: ['10001', '11011', '10101', '10001', '10001'],
+    a: ['000', '110', '011', '101', '011'],
+    k: ['100', '101', '110', '110', '101'],
+    e: ['000', '010', '111', '100', '011'],
+    i: ['1', '0', '1', '1', '1'],
+    t: ['010', '111', '010', '010', '011'],
+    y: ['000', '101', '101', '011', '110'],
+    o: ['000', '010', '101', '101', '010'],
+    u: ['000', '101', '101', '101', '011'],
+    r: ['000', '011', '100', '100', '100'],
+    w: ['00000', '10001', '10101', '10101', '01010'],
+    n: ['000', '110', '101', '101', '101'],
+    '.': ['0', '0', '0', '0', '1'],
   };
-  // returns a map "r,c" -> order (typing order) for the lit pixels, centred in the micro grid
+  // returns a map "r,c" -> { n: letter index } for the lit pixels, centred in the cube grid
   function pixelText(C, R, portrait) {
-    const lines = portrait || C < 46 ? ['Make', 'it your', 'own.'] : ['Make it', 'your own.'];
-    const SP = C < 46 || portrait ? 2 : 3;
+    const SP = 2;
     const lw = l => { let w = 0; [...l].forEach((ch, i) => { w += ch === ' ' ? SP : GLYPHS[ch][0].length + (i < l.length - 1 && l[i + 1] !== ' ' ? 1 : 0); }); return w; };
-    const LH = 7, LG = 3, total = lines.length * LH + (lines.length - 1) * LG;
-    const r0 = Math.max(0, Math.floor((R - total) / 2) - (portrait ? 2 : 1));
+    const one = 'Make it your own.';
+    const lines = lw(one) <= C - 6 ? [one] : ['Make it', 'your own.'];
+    const LH = 5, LG = 3, total = lines.length * LH + (lines.length - 1) * LG;
+    const r0 = Math.max(0, Math.floor((R - total) / 2));
     const map = new Map(); let n = 0;
     lines.forEach((l, li) => {
       let c = Math.floor((C - lw(l)) / 2); const rr = r0 + li * (LH + LG);
       [...l].forEach((ch, ci) => {
         if (ch === ' ') { c += SP; return; }
         const gl = GLYPHS[ch], w = gl[0].length;
-        for (let x = 0; x < w; x++) for (let y = 0; y < LH; y++) if (gl[y][x] === '1') map.set((rr + y) + ',' + (c + x), { n: n, x, y });
+        for (let x = 0; x < w; x++) for (let y = 0; y < LH; y++) if (gl[y][x] === '1') map.set((rr + y) + ',' + (c + x), { n });
         n++;
         c += w + (ci < l.length - 1 && l[ci + 1] !== ' ' ? 1 : 0);
       });
@@ -376,7 +421,7 @@
     if (tp <= 0) return;
     const type = seg(sv, 358, 420), fade = smooth(seg(sv, 442, 462));
     const cs = M.mpx - M.mg, ch = M.mpy - M.mg, rad = Math.min(cs, ch) * 0.24;
-    const LIT = '#cba7da';
+    const LIT = '#f2f2f4';   // the soft white used for text across the site
     for (let r = 0; r < M.MR; r++) {
       for (let c = 0; c < M.MC; c++) {
         const v = (c / (M.MC - 1) + r / (M.MR - 1)) / 2;
@@ -400,18 +445,13 @@
           const at = lit.n / Math.max(1, M.mask.chars) * 0.88 + hash(r, c) * 0.06;
           const k = seg(type, at, at + 0.06);
           if (k > 0) {
-            const pk = easeBack(k) * (1 - fade);
-            if (pk > 0.001) {
-              const s2 = Math.min(cs, ch) * (0.7 + 0.42 * pk);
-              const cx = x + cs / 2, cy = y + ch / 2;
-              g.globalAlpha = Math.min(1, k * 2) * (1 - fade);
-              g.fillStyle = LIT;
-              g.beginPath();
-              if (hash(c, r) < 0.42) g.arc(cx, cy, s2 / 2, 0, 6.2832);
-              else g.roundRect(cx - s2 / 2, cy - s2 / 2, s2, s2, s2 * 0.18);
-              g.fill();
-              g.globalAlpha = 1;
-            }
+            const pk = easeBack(k);
+            const sc = 0.82 + 0.18 * pk;
+            const w3 = cs * sc, h3 = ch * sc;
+            g.globalAlpha = Math.min(1, k * 2) * (1 - fade);
+            g.fillStyle = LIT;
+            g.beginPath(); g.roundRect(x + (cs - w3) / 2, y + (ch - h3) / 2, w3, h3, rad * sc); g.fill();
+            g.globalAlpha = 1;
           }
         }
       }
