@@ -146,7 +146,7 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 640;
+  const S_END = 580;
   const D = 80;   // the add-image steps run this much later, after the pixel lettering
   let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, panels = [], menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
@@ -160,7 +160,8 @@
     const u = parseFloat(stage.style.getPropertyValue('--u')) || stage.clientWidth / (portrait ? 1000 : 2000);
     const k = (stage.dataset.fit || '') + '|' + u.toFixed(4) + (portrait ? 'p' : 'l');
     // the page runtime can re-render this markup, which drops the generated tiles and inline positions
-    const fresh = !plusEl || plusEl.parentNode !== grid || !cap.style.left;
+    const ttl = document.getElementById('cz-title');
+    const fresh = !plusEl || plusEl.parentNode !== grid || (ttl && !ttl.style.left);
     if (L5 && layoutKey === k && !fresh) return L5;
     if (fresh) gridKey = '';
     const Hs = stage.clientHeight / u;
@@ -173,22 +174,25 @@
     if (!portrait) {
       // content as it sits at the end of the colour step
       box = { x0: 82, x1: 1919, y0: 145, y1: 980 };
-      cx = 1000.5; maxW = 1760; cols = 12; capW = 920;
+      cx = 1000.5; maxW = 1560; cols = 12; capW = 920;
     } else {
       box = { x0: 30, x1: 970, y0: 200, y1: Hs - 50 };
       cx = 500; maxW = 940; cols = 6; capW = 900;
     }
     cap.style.width = 'calc(var(--u) * ' + capW + ')';
-    cap.style.display = 'none';   // no caption under the screen: the box gets the whole height, centred
-    const capH = 0;
-    const PAD = 20, CAPGAP = 0;
+    cap.style.display = 'none';   // no caption under the screen
+    // "Make it your own." sits above the screen box; the title + box are centred together
+    const title = document.getElementById('cz-title');
+    const titleH = title ? title.offsetHeight / u : 0;
+    const capH = titleH;
+    const PAD = 20, CAPGAP = titleH ? 26 : 0;
     // the screen box + caption, as one group, is as large as the space allows and
     // vertically centred between the nav and the bottom of the screen
     const top0 = navB + 32, bot0 = vBot - 32, avail = bot0 - top0;
     const bw = box.x1 - box.x0, bh = box.y1 - box.y0;
     const s = Math.max(0.2, Math.min((avail - capH - CAPGAP - 2 * PAD) / bh, (maxW - 2 * PAD) / bw, 0.92));
     const fw = bw * s + 2 * PAD, fh = bh * s + 2 * PAD, fx = cx - fw / 2;
-    const fy = top0 + (avail - (fh + CAPGAP + capH)) / 2;
+    const fy = top0 + (avail - (fh + CAPGAP + capH)) / 2 + capH + CAPGAP;
     const bcx = (box.x0 + box.x1) / 2, bcy = (box.y0 + box.y1) / 2;
     // the zoomed-out content sits inside the box with a generous margin (the box itself keeps its size)
     const IN = portrait ? 44 : 52;
@@ -196,7 +200,7 @@
     const L = { box, s: sIn, PAD, padX: (fw - bw * sIn) / 2, padY: (fh - bh * sIn) / 2, fx, fy, fw, fh, bcx, bcy, dx: fx + fw / 2 - bcx, dy: fy + fh / 2 - bcy };
 
     // caption keeps the width it was measured at (on phones it can be wider than the box, so it stays left-aligned with the page)
-    cap.style.left = U(portrait ? Math.min(fx + 4, (1000 - capW) / 2) : fx + 4); cap.style.top = U(fy + fh + CAPGAP);
+    if (title) { title.style.left = U(fx + 2); title.style.top = U(fy - CAPGAP - titleH); }
 
     // tile grid: one even gap between every tile, one even border on all four sides;
     // plus tile spans the last 3 rows of the last column
@@ -241,7 +245,7 @@
     ps.left = U(bx); ps.top = U(by); ps.width = U(bw2); ps.height = U(bh2);
     // micro grid: every big cell holds K x K tiny cubes, so the image box and plus still line up with them
     const MC = cols * K, MR = rows * K;
-    L.M = { K, MC, MR, mpx, mpy, mg, ox: ix - bx, oy: iy - by, bw2, bh2, u, mask: pixelText(MC, MR, portrait) };
+    L.M = { K, MC, MR, mpx, mpy, mg, ox: ix - bx, oy: iy - by, bw2, bh2, u, mask: new Map() };   // pixel lettering retired: the title sits above the box instead
     L.bx = bx; L.by = by; L.portrait = portrait;
     const pr = rows - 3;
     plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
@@ -323,6 +327,13 @@
     // tiny cubes flip in across the screen, then some light up to spell "Make it your own." in pixels
     drawPixels(L, sv);
     panelScene(L, sv);
+    const title = document.getElementById('cz-title');
+    if (title) title.querySelectorAll('.cz-tw').forEach((w, i) => {
+      const k = seg(sv, 356 + i * 9, 368 + i * 9), e = easeOut(k);
+      w.style.opacity = e.toFixed(3);
+      w.style.transform = 'translate3d(0,' + U((1 - e) * 22) + ',0)';
+      w.style.filter = k > 0 && k < 1 ? 'blur(' + ((1 - e) * 6).toFixed(2) + 'px)' : '';
+    });
   }
 
   // ---------- three panels drawn out with the corner dot ----------
@@ -342,7 +353,7 @@
     const R = Math.min(M.mpx, M.mpy) * 1.05;
     panels.forEach((p, i) => {
       const c0 = mX + Math.floor(extra / 2) + i * (pw + gapC), c1 = c0 + pw - 1;
-      const s0 = 470 + i * 40;
+      const s0 = 405 + i * 40;
       const a = seg(sv, s0, s0 + 6), d = easeIO(seg(sv, s0 + 6, s0 + 32)), e = smooth(seg(sv, s0 + 32, s0 + 40));
       const x = cellX(c0), y = cellY(r0);
       const fullW = cellX(c1) + cs - x, fullH = cellY(r1) + ch - y;
