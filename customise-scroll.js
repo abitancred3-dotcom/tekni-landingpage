@@ -327,7 +327,8 @@
       const x0 = ox + (L.box.x0 - L.bcx) * sc - px, x1 = ox + (L.box.x1 - L.bcx) * sc + px;
       const y0 = oy + (L.box.y0 - L.bcy) * sc - py, y1 = oy + (L.box.y1 - L.bcy) * sc + py;
       fr.style.left = U(x0); fr.style.top = U(y0); fr.style.width = U(x1 - x0); fr.style.height = U(y1 - y0);
-      fr.style.opacity = easeOut(seg(z, 0.15, 0.85)).toFixed(3);
+      // the outer screen box fades away together with the cube grid once the panels are drawn
+      fr.style.opacity = (easeOut(seg(z, 0.15, 0.85)) * (1 - smooth(seg(sv, 528, 560)))).toFixed(3);
     }
     const rise = (k) => 'translate3d(0,' + U((1 - easeOut(k)) * 18) + ',0)';
     const ck = seg(sv, 236, 262);
