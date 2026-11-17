@@ -6,6 +6,7 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const seg = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
   const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const smooth = t => t * t * (3 - 2 * t);
   const easeIO = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   const easeBack = t => { const c = 1.5; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
   const U = n => 'calc(var(--u) * ' + n.toFixed(2) + ')';
@@ -145,8 +146,9 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 580;
-  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, menuEl = null, imgEl = null, handleEl = null, imgRow = null;
+  const S_END = 660;
+  const D = 80;   // the add-image steps run this much later, after the pixel lettering
+  let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
   window.addEventListener('resize', () => { layoutKey = ''; });
 
@@ -207,26 +209,10 @@
     const gk = cols + 'x' + rows;
     if (gk !== gridKey) {
       gridKey = gk; grid.textContent = ''; tiles = [];
-      const cells = [];
-      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-        if (c === cols - 1 && r >= rows - 3) continue;
-        cells.push({ r, c });
-      }
-      // diagonal sweep from the top-left corner (matches the backdrop's 'to bottom right' mask)
-      cells.forEach(cell => { cell.v = (cell.c / (cols - 1) + cell.r / (rows - 1)) / 2; });
-      cells.sort((a, b) => a.v - b.v || a.r - b.r);
-      // screen colour behind each tile (its cell plus half of each surrounding gap) switches on with
-      // that tile, hard-edged, so the content underneath is hidden without a soft shadow sweeping across
-      backEl = document.createElement('div'); backEl.className = 'cz-back'; grid.appendChild(backEl);
-      // styled inline so a cached older stylesheet can't hide it
-      backEl.style.cssText = 'position:absolute;overflow:hidden;opacity:1;background:none;border-radius:calc(var(--u) * 32.5)';
-      const BK = 'position:absolute;display:block;background:#000;opacity:0';
-      cells.forEach(cell => {
-        const bk = document.createElement('i'); bk.style.cssText = BK; backEl.appendChild(bk);
-        const el = document.createElement('div'); el.className = 'cz-tile'; grid.appendChild(el);
-        tiles.push({ el, bk, r: cell.r, c: cell.c, v: cell.v });
-      });
-      plusBk = document.createElement('i'); plusBk.style.cssText = BK; backEl.appendChild(plusBk);
+      // the screen is filled by a fine grid of tiny cubes drawn on one canvas (far too many for DOM nodes)
+      pixCv = document.createElement('canvas'); pixCv.className = 'cz-pixcv';
+      pixCv.style.cssText = 'position:absolute;display:block;pointer-events:none;border-radius:calc(var(--u) * 32.5)';
+      grid.appendChild(pixCv);
       plusEl = document.createElement('div'); plusEl.className = 'cz-tile'; plusEl.id = 'cz-plus';
       plusEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>';
       grid.appendChild(plusEl);
@@ -234,18 +220,15 @@
     }
     // corners concentric with the screen frame (frame radius 34, minus border and inset); all tiles share the plus tile's fill
     const TR = U(34 - B - inset);
-    tiles.forEach(t => { const s2 = t.el.style; s2.left = U(X(t.c)); s2.top = U(Y(t.r)); s2.width = U(tw); s2.height = U(th); s2.borderRadius = TR; s2.background = '#0c0c0c'; });
     plusEl.style.borderRadius = TR; plusEl.style.background = '#0c0c0c';
     const bx = fx + B, by = fy + B, bw2 = fw - 2 * B, bh2 = fh - 2 * B;
-    const bs = backEl.style;
-    bs.left = U(bx); bs.top = U(by); bs.width = U(bw2); bs.height = U(bh2);
-    // cell edges: halfway into each gap, out to the frame edge on the outer rows/columns (0.6 overlap hides seams)
-    const ex = c => c <= 0 ? 0 : X(c) - g / 2 - bx, ey = r => r <= 0 ? 0 : Y(r) - g / 2 - by;
-    const ex1 = c => c >= cols - 1 ? bw2 : X(c) + tw + g / 2 - bx, ey1 = r => r >= rows - 1 ? bh2 : Y(r) + th + g / 2 - by;
-    const place = (el, c0, c1, r0, r1) => { const st = el.style; st.left = U(ex(c0) - 0.3); st.top = U(ey(r0) - 0.3); st.width = U(ex1(c1) - ex(c0) + 0.6); st.height = U(ey1(r1) - ey(r0) + 0.6); };
-    tiles.forEach(t => place(t.bk, t.c, t.c, t.r, t.r));
+    const ps = pixCv.style;
+    ps.left = U(bx); ps.top = U(by); ps.width = U(bw2); ps.height = U(bh2);
+    // micro grid: every big cell holds K x K tiny cubes, so the image box and plus still line up with them
+    const K = 5, mpx = (tw + g) / K, mpy = (th + g) / K;
+    const MC = cols * K, MR = Math.round((ih + g) / mpy);
+    L.M = { K, MC, MR, mpx, mpy, mg: Math.min(mpx, mpy) * 0.2, ox: ix - bx, oy: iy - by, bw2, bh2, u, mask: pixelText(MC, MR, portrait) };
     const pr = rows - 3;
-    place(plusBk, cols - 1, cols - 1, pr, rows - 1);
     plusEl.style.left = U(X(cols - 1)); plusEl.style.top = U(Y(pr)); plusEl.style.width = U(tw);
     plusEl.style.height = U(Y(rows - 1) + th - Y(pr));
     // geometry the add-image step needs
@@ -322,31 +305,113 @@
     const ck = seg(sv, 236, 262);
     set($('cz-cap'), easeOut(ck), rise(ck));
 
-    // tiles flip over one by one until the screen is full, then the plus pops in
-    const tp = seg(sv, 262, 396), N = tiles.length, W = 0.07;
-    for (let i = 0; i < N; i++) {
-      const a = (i / Math.max(1, N - 1)) * (1 - W);
-      const t = seg(tp, a, a + W), e = easeOut(t);
-      const st = tiles[i].el.style;
-      st.opacity = t > 0 ? Math.min(1, t * 3).toFixed(3) : '0';
-      tiles[i].bk.style.opacity = t > 0 ? '1' : '0';
-      st.transform = t > 0 && t < 1 ? 'perspective(700px) rotateY(' + ((1 - e) * -120).toFixed(1) + 'deg) scale(' + (0.9 + 0.1 * e).toFixed(3) + ')' : '';
-    }
-    // the plus tile's cell goes dark together with the last ordinary tile
-    if (plusBk) plusBk.style.opacity = tp > (1 - W) ? '1' : '0';
+    // tiny cubes flip in across the screen, then some light up to spell "Make it your own." in pixels
+    drawPixels(L, sv);
     if (plusEl) {
-      const q = seg(sv, 394, 414);
+      const q = seg(sv - D, 394, 414);
       plusEl.style.opacity = easeOut(q).toFixed(3);
       plusEl.style.transform = q < 1 ? 'perspective(700px) rotateY(' + ((1 - easeOut(q)) * -120).toFixed(1) + 'deg) scale(' + (0.85 + 0.15 * easeBack(q)).toFixed(3) + ')' : '';
       // plus box lights up pink, stays lit while the menu is open
-      const hl = easeOut(seg(sv, 418, 430)) * (1 - easeOut(seg(sv, 466, 478)));
+      const hl = easeOut(seg(sv - D, 418, 430)) * (1 - easeOut(seg(sv - D, 466, 478)));
       const pc = 'color-mix(in srgb, var(--cz-acc) ' + (hl * 100).toFixed(1) + '%, rgba(255,255,255,0.3))';
       plusEl.style.borderColor = pc;
       plusEl.style.borderWidth = hl > 0.01 ? '1.5px' : '';
       const psvg = plusEl.querySelector('svg');
       if (psvg) { psvg.style.stroke = 'color-mix(in srgb, var(--cz-acc) ' + (hl * 100).toFixed(1) + '%, #fff)'; psvg.style.strokeWidth = (1.6 + 0.6 * hl).toFixed(2); }
     }
-    addImageScene(L, sv);
+    addImageScene(L, sv - D);
+  }
+
+  // ---------- pixel lettering ----------
+  const GLYPHS = {
+    M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+    a: ['00000', '00000', '01110', '00001', '01111', '10001', '01111'],
+    k: ['10000', '10000', '10010', '10100', '11000', '10100', '10010'],
+    e: ['00000', '00000', '01110', '10001', '11111', '10000', '01110'],
+    i: ['1', '0', '1', '1', '1', '1', '1'],
+    t: ['010', '010', '111', '010', '010', '010', '001'],
+    y: ['00000', '00000', '10001', '10001', '01111', '00001', '01110'],
+    o: ['00000', '00000', '01110', '10001', '10001', '10001', '01110'],
+    u: ['00000', '00000', '10001', '10001', '10001', '10011', '01101'],
+    r: ['0000', '0000', '1011', '1100', '1000', '1000', '1000'],
+    w: ['00000', '00000', '10001', '10001', '10101', '10101', '01010'],
+    n: ['00000', '00000', '10110', '11001', '10001', '10001', '10001'],
+    '.': ['0', '0', '0', '0', '0', '0', '1'],
+  };
+  // returns a map "r,c" -> order (typing order) for the lit pixels, centred in the micro grid
+  function pixelText(C, R, portrait) {
+    const lines = portrait || C < 46 ? ['Make', 'it your', 'own.'] : ['Make it', 'your own.'];
+    const SP = C < 46 || portrait ? 2 : 3;
+    const lw = l => { let w = 0; [...l].forEach((ch, i) => { w += ch === ' ' ? SP : GLYPHS[ch][0].length + (i < l.length - 1 && l[i + 1] !== ' ' ? 1 : 0); }); return w; };
+    const LH = 7, LG = 3, total = lines.length * LH + (lines.length - 1) * LG;
+    const r0 = Math.max(0, Math.floor((R - total) / 2) - (portrait ? 2 : 1));
+    const map = new Map(); let n = 0;
+    lines.forEach((l, li) => {
+      let c = Math.floor((C - lw(l)) / 2); const rr = r0 + li * (LH + LG);
+      [...l].forEach((ch, ci) => {
+        if (ch === ' ') { c += SP; return; }
+        const gl = GLYPHS[ch], w = gl[0].length;
+        for (let x = 0; x < w; x++) for (let y = 0; y < LH; y++) if (gl[y][x] === '1') map.set((rr + y) + ',' + (c + x), { n: n, x, y });
+        n++;
+        c += w + (ci < l.length - 1 && l[ci + 1] !== ' ' ? 1 : 0);
+      });
+    });
+    map.chars = n;
+    return map;
+  }
+  const hash = (a, b) => { const h = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return h - Math.floor(h); };
+  function drawPixels(L, sv) {
+    const M = L.M; if (!pixCv || !M) return;
+    const u = M.u, dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = M.bw2 * u, H = M.bh2 * u;
+    if (pixCv.width !== Math.round(W * dpr) || pixCv.height !== Math.round(H * dpr)) { pixCv.width = Math.round(W * dpr); pixCv.height = Math.round(H * dpr); }
+    const g = pixCv.getContext('2d');
+    g.setTransform(dpr * u, 0, 0, dpr * u, 0, 0);   // draw in design units
+    g.clearRect(0, 0, M.bw2, M.bh2);
+    const tp = seg(sv, 262, 352), Wd = 0.12;
+    if (tp <= 0) return;
+    const type = seg(sv, 358, 420), fade = smooth(seg(sv, 442, 462));
+    const cs = M.mpx - M.mg, ch = M.mpy - M.mg, rad = Math.min(cs, ch) * 0.24;
+    const LIT = '#cba7da';
+    for (let r = 0; r < M.MR; r++) {
+      for (let c = 0; c < M.MC; c++) {
+        const v = (c / (M.MC - 1) + r / (M.MR - 1)) / 2;
+        const a = v * (1 - Wd), t = seg(tp, a, a + Wd);
+        if (t <= 0) continue;
+        // screen colour behind the cube (its cell plus half the gap; outer cells run to the frame edge)
+        const x = M.ox + c * M.mpx, y = M.oy + r * M.mpy;
+        const x0 = c === 0 ? 0 : x - M.mg / 2, y0 = r === 0 ? 0 : y - M.mg / 2;
+        const x1 = c === M.MC - 1 ? M.bw2 : x + cs + M.mg / 2, y1 = r === M.MR - 1 ? M.bh2 : y + ch + M.mg / 2;
+        g.fillStyle = '#000'; g.fillRect(x0 - 0.3, y0 - 0.3, x1 - x0 + 0.6, y1 - y0 + 0.6);
+        // the cube flips in (squashes horizontally as it turns)
+        const e = easeOut(t), sx = 0.15 + 0.85 * e;
+        g.globalAlpha = Math.min(1, t * 3);
+        const w2 = cs * sx;
+        g.fillStyle = '#0c0c0c';
+        g.beginPath(); g.roundRect(x + (cs - w2) / 2, y, w2, ch, rad); g.fill();
+        g.globalAlpha = 1;
+        // lit pixels of the lettering: typed out letter by letter, mixed square and round dots
+        const lit = M.mask.get(r + ',' + c);
+        if (lit && type > 0 && fade < 1) {
+          const at = lit.n / Math.max(1, M.mask.chars) * 0.88 + hash(r, c) * 0.06;
+          const k = seg(type, at, at + 0.06);
+          if (k > 0) {
+            const pk = easeBack(k) * (1 - fade);
+            if (pk > 0.001) {
+              const s2 = Math.min(cs, ch) * (0.7 + 0.42 * pk);
+              const cx = x + cs / 2, cy = y + ch / 2;
+              g.globalAlpha = Math.min(1, k * 2) * (1 - fade);
+              g.fillStyle = LIT;
+              g.beginPath();
+              if (hash(c, r) < 0.42) g.arc(cx, cy, s2 / 2, 0, 6.2832);
+              else g.roundRect(cx - s2 / 2, cy - s2 / 2, s2, s2, s2 * 0.18);
+              g.fill();
+              g.globalAlpha = 1;
+            }
+          }
+        }
+      }
+    }
   }
 
   function addImageScene(L, sv) {
