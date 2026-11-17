@@ -146,7 +146,7 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 580;
+  const S_END = 650;
   const D = 80;   // the add-image steps run this much later, after the pixel lettering
   let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, panels = [], menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
@@ -228,13 +228,22 @@
       buildMenuAndImage(grid);
       // the plus box / menu / image steps are retired: three panels are drawn out instead
       [plusEl, menuEl, imgEl, handleEl].forEach(el => { if (el) el.style.display = 'none'; });
-      panels = [0, 1, 2].map(() => {
+      panels = []; [0, 1, 2].map(() => {
         const box = document.createElement('div');
         box.style.cssText = 'position:absolute;z-index:4;opacity:0;box-sizing:border-box;background:#050505;border:1.5px solid rgba(255,255,255,0.14);transform-origin:0 0;will-change:width,height,opacity';
         const dot = document.createElement('div');
         dot.style.cssText = 'position:absolute;z-index:5;opacity:0;box-sizing:border-box;border-radius:50%;background:#0c0c0c;border:2px solid var(--cz-acc);transform:translate(-50%,-50%)';
+        box.style.overflow = 'hidden';
+        const [ttl, items] = PANEL_COPY[panels.length];
+        const body = document.createElement('div');
+        body.style.cssText = 'position:absolute;left:0;top:0;padding:calc(var(--u) * 34 * var(--fs, 1)) calc(var(--u) * 32 * var(--fs, 1));box-sizing:border-box;width:calc(var(--u) * var(--pw, 400))';
+        body.innerHTML = '<div class="cz-pt" style="font-size:calc(var(--u) * 25 * var(--fs, 1));font-weight:600;line-height:1.2;letter-spacing:-0.005em;color:#f2f2f4;opacity:0;margin:0 0 calc(var(--u) * 26 * var(--fs, 1))">' + ttl + '</div>' +
+          items.map(t => '<div class="cz-pb" style="position:relative;padding-left:calc(var(--u) * 28 * var(--fs, 1));margin:0 0 calc(var(--u) * 20 * var(--fs, 1));font-size:calc(var(--u) * 20 * var(--fs, 1));font-weight:400;line-height:1.38;color:#d8d8da;opacity:0">' +
+            '<span style="position:absolute;left:0;top:0.62em;width:calc(var(--u) * 8 * var(--fs, 1));height:calc(var(--u) * 8 * var(--fs, 1));border-radius:50%;background:#d8d8da;transform:translateY(-50%)"></span>' + t + '</div>').join('');
+        box.appendChild(body);
         grid.appendChild(box); grid.appendChild(dot);
-        return { box, dot };
+        panels.push({ box, dot, body });
+        return panels[panels.length - 1];
       });
     }
     // corners concentric with the screen frame (frame radius 34, minus border and inset); all tiles share the plus tile's fill
@@ -336,6 +345,11 @@
     });
   }
 
+  const PANEL_COPY = [
+    ['Customise your portfolio', ['Customise in-app and website portfolios.', 'Determine your own grid view in the app.', 'Organise your work using tabs within the app.']],
+    ['Choose what to include', ['Post to your feed without taking up portfolio space.', 'Display only your best work and save the rest to your studio.', 'Publish your finished portfolio to non-users only when ready.']],
+    ['Connect your process', ['Connect your moodboards or workspaces to your finished posts to enhance your projects.', 'Display only your best work and save the rest to your studio.', 'Publish your finished portfolio to non-users only when ready.']],
+  ];
   // ---------- three panels drawn out with the corner dot ----------
   // Each panel appears as a small rounded square at its top-left cube, then its corner dot drags it out
   // smoothly to full size (lined up with the cubes); the outline and dot are pink while it's being drawn.
@@ -343,7 +357,7 @@
     const M = L.M; if (!M || !panels.length) return;
     const portrait = L.portrait;
     const N = 3, MC = M.MC, MR = M.MR;
-    const mX = portrait ? 2 : 3, gapC = portrait ? 2 : 3;
+    const mX = portrait ? 1 : 3, gapC = portrait ? 2 : 3;
     const pw = Math.floor((MC - 2 * mX - (N - 1) * gapC) / N);
     const extra = MC - 2 * mX - (N - 1) * gapC - pw * N;
     const r0 = 2, r1 = MR - 3;
@@ -351,13 +365,29 @@
     const X0 = L.bx + M.ox, Y0 = L.by + M.oy;
     const cellX = c => X0 + c * M.mpx, cellY = r => Y0 + r * M.mpy;
     const R = Math.min(M.mpx, M.mpy) * 1.05;
+    // phones: the three panels stack as rows so their text has room
+    const gapR = 1, phR = Math.floor((MR - 3 - (N - 1) * gapR) / N);
     panels.forEach((p, i) => {
-      const c0 = mX + Math.floor(extra / 2) + i * (pw + gapC), c1 = c0 + pw - 1;
+      let c0 = mX + Math.floor(extra / 2) + i * (pw + gapC), c1 = c0 + pw - 1, pr0 = r0, pr1 = r1;
+      if (portrait) { c0 = mX; c1 = MC - mX - 1; pr0 = 1 + i * (phR + gapR); pr1 = pr0 + phR - 1; }
       const s0 = 405 + i * 40;
       const a = seg(sv, s0, s0 + 6), d = easeIO(seg(sv, s0 + 6, s0 + 32)), e = smooth(seg(sv, s0 + 32, s0 + 40));
-      const x = cellX(c0), y = cellY(r0);
-      const fullW = cellX(c1) + cs - x, fullH = cellY(r1) + ch - y;
-      const startW = cellX(c0 + 2) + cs - x, startH = cellY(r0 + 2) + ch - y;
+      const x = cellX(c0), y = cellY(pr0);
+      const fullW = cellX(c1) + cs - x, fullH = cellY(pr1) + ch - y;
+      const startW = cellX(c0 + 2) + cs - x, startH = cellY(pr0 + 2) + ch - y;
+      // copy fades in, line by line, once the grid behind has faded away
+      if (p.body) {
+        p.body.style.setProperty('--pw', fullW.toFixed(1));
+        p.body.style.setProperty('--fs', portrait ? '1.3' : '1');
+        const lines = p.body.children;
+        for (let j = 0; j < lines.length; j++) {
+          const k = seg(sv, 552 + i * 9 + j * 6, 566 + i * 9 + j * 6), e2 = easeOut(k);
+          const st2 = lines[j].style;
+          st2.opacity = e2.toFixed(3);
+          st2.transform = 'translate3d(0,' + U((1 - e2) * 16) + ',0)';
+          st2.filter = k > 0 && k < 1 ? 'blur(' + ((1 - e2) * 5).toFixed(2) + 'px)' : '';
+        }
+      }
       const w = startW + (fullW - startW) * d, h = startH + (fullH - startH) * d;
       const bs = p.box.style;
       bs.left = U(x); bs.top = U(y); bs.width = U(w); bs.height = U(h);
@@ -431,6 +461,8 @@
     const tp = seg(sv, 262, 352), Wd = 0.12;
     if (tp <= 0) return;
     const type = seg(sv, 358, 420), fade = smooth(seg(sv, 442, 462));
+    // after the three panels are drawn, the cube grid fades out from behind them
+    const gridOn = 1 - smooth(seg(sv, 528, 560));
     const cs = M.mpx - M.mg, ch = M.mpy - M.mg, rad = Math.min(cs, ch) * 0.24;
     const LIT = '#f2f2f4';   // the soft white used for text across the site
     for (let r = 0; r < M.MR; r++) {
@@ -445,7 +477,7 @@
         g.fillStyle = '#000'; g.fillRect(x0 - 0.3, y0 - 0.3, x1 - x0 + 0.6, y1 - y0 + 0.6);
         // the cube flips in (squashes horizontally as it turns)
         const e = easeOut(t), sx = 0.15 + 0.85 * e;
-        g.globalAlpha = Math.min(1, t * 3);
+        g.globalAlpha = Math.min(1, t * 3) * gridOn;
         const w2 = cs * sx;
         g.fillStyle = '#0c0c0c';
         g.beginPath(); g.roundRect(x + (cs - w2) / 2, y, w2, ch, rad); g.fill();
