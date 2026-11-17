@@ -38,11 +38,11 @@
   // with its neighbours collapsed to header bars above and below. Scrolling rolls the stack up through the
   // centre: the open card's content fades, it shrinks to a bar and lifts, while the bar below grows open.
   const HC = 98, GAP = 30;
-  const SEQ = [['disc', 1, 1.7], ['insp', 2, 1.3], ['mood', 3, 2.0], ['collab', 4, 3.0]];
+  const SEQ = [['disc', 1, 1.7], ['insp', 2, 1.3], ['mood', 3, 2.0], ['collab', 4, 2.2]];
   const LEAD = 0.3, T = 0.8, TAIL = 0.35;
   const TOTAL = LEAD + SEQ.reduce((a, s) => a + s[2], 0) + T * (SEQ.length - 1) + TAIL;
   const REPLIES = [0.56, 0.63, 0.70, 0.77];
-  const CONTENT = '.ds-ui,.dv-body,.dv-mb-ui,.cb-ui,.vc-mbimg,.vc-dotcv';
+  const CONTENT = '.ds-ui,.dv-body,.dv-mb-ui,.cb-ui,.cb2,.vc-mbimg,.vc-dotcv';
   // where each card's hold starts on the raw timeline
   const START = {};
   { let t = LEAD; SEQ.forEach(([k, , len], i) => { START[k] = t; t += len + (i < SEQ.length - 1 ? T : 0); }); }
@@ -128,12 +128,22 @@
           const comp = el.querySelector('.ds-compose');
           if (comp && !portrait) comp.style.opacity = ((parseFloat(comp.style.opacity) || 0) * (1 - smooth(seg(prog.disc, 0.44, 0.5)))).toFixed(3);
         }
-        else if (kk === 'collab') S.collabScene(prog.collab, el);
         else if (kk === 'mood') S.moodScene(seg(shown, MOOD_FROM, START.mood + 2.0), el);
       }
       if (kk === 'insp') {
         const t2 = el.querySelector('.vc-t2');
         if (t2) t2.style.opacity = shown >= D_PRESS ? '0' : '1';
+      }
+      if (kk === 'collab') {
+        // lines draw out from the image one by one, then each comment / note pops in at the end of its line
+        const cp = prog.collab;
+        el.querySelectorAll('.cb2-line').forEach((ln, i) => { const k2 = smooth(seg(cp, 0.06 + i * 0.24, 0.2 + i * 0.24)); ln.style.strokeDashoffset = (1 - k2).toFixed(4); });
+        el.querySelectorAll('.cb2-item').forEach((it2, i) => {
+          const k2 = seg(cp, 0.18 + i * 0.24, 0.27 + i * 0.24), e2 = smooth(k2);
+          it2.style.opacity = e2.toFixed(3);
+          it2.style.visibility = k2 > 0.001 ? 'visible' : 'hidden';
+          it2.style.transform = 'translate3d(' + U((1 - e2) * -14) + ',0,0) scale(' + (0.92 + 0.08 * e2).toFixed(4) + ')';
+        });
       }
       if (kk === 'mood') {
         const mb = el.querySelector('.vc-mbimg');

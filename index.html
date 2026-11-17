@@ -17,7 +17,7 @@
 <script src="./connect-scroll.js?v=4d856f1320"></script>
 <script src="./customise-scroll.js?v=6b64a6c725"></script>
 <script src="./discover-scroll.js?v=f8383738e3"></script>
-<script src="./finalpost-scroll.js?v=c852308343"></script>
+<script src="./finalpost-scroll.js?v=d95e923153"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -118,6 +118,24 @@
   .vc-cursor .dv-hand{position:absolute;left:calc(var(--u)*-17);top:calc(var(--u)*-15);width:calc(var(--u)*38);height:calc(var(--u)*38);filter:drop-shadow(0 calc(var(--u)*2) calc(var(--u)*5) rgba(0,0,0,0.55))}
   .vc-cursor .dv-who{position:absolute;left:calc(var(--u)*24);top:calc(var(--u)*20);width:calc(var(--u)*46);height:calc(var(--u)*46);border-radius:calc(var(--u)*10);background:#fbe4ae;box-shadow:0 calc(var(--u)*4) calc(var(--u)*12) rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center}
   .vc-cursor .dv-who svg{width:78%;height:78%}
+  /* Collaboration (carousel): version board with comment threads drawn out from the image */
+  .cb2{position:absolute;left:0;top:0;width:calc(var(--u)*980);height:calc(var(--u)*560);pointer-events:none}
+  .cb2-svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
+  .cb2-line{fill:none;stroke:rgba(255,255,255,0.85);stroke-width:1.2px;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1}
+  .cb2-img{position:absolute;left:calc(var(--u)*100);top:calc(var(--u)*138);width:calc(var(--u)*276);height:calc(var(--u)*317);border:calc(var(--u)*2.4) solid #8ec0ef;border-radius:calc(var(--u)*13);background:#3d3d3d}
+  .cb2-v{position:absolute;left:calc(var(--u)*110);top:calc(var(--u)*454);display:flex;align-items:center;justify-content:center;width:calc(var(--u)*31);height:calc(var(--u)*20);border-radius:0 0 calc(var(--u)*5) calc(var(--u)*5);background:#8ec0ef;color:#16283a;font-size:calc(var(--u)*12.5)}
+  .cb2-item{position:absolute;opacity:0;visibility:hidden;transform-origin:0 50%}
+  .cb2-c{width:calc(var(--u)*266);height:calc(var(--u)*95);border-radius:calc(var(--u)*14);background:#141414;border:1px solid rgba(255,255,255,0.04)}
+  .cb2-c1{left:calc(var(--u)*527);top:calc(var(--u)*60)}
+  .cb2-c2{left:calc(var(--u)*621);top:calc(var(--u)*409)}
+  .cb2-av{position:absolute;left:calc(var(--u)*13);top:calc(var(--u)*13);width:calc(var(--u)*26);height:calc(var(--u)*26);border-radius:calc(var(--u)*6);background:#8a8a8a}
+  .cb2-name{position:absolute;left:calc(var(--u)*49);top:calc(var(--u)*14);font-size:calc(var(--u)*13);color:#f2f2f4}
+  .cb2-when{position:absolute;left:calc(var(--u)*124);top:calc(var(--u)*14.5);font-size:calc(var(--u)*12.5);color:#8a8a90}
+  .cb2-c2 .cb2-when{left:calc(var(--u)*110)}
+  .cb2-txt{position:absolute;left:calc(var(--u)*49);top:calc(var(--u)*35);width:calc(var(--u)*190);margin:0;font-size:calc(var(--u)*13);line-height:1.22;color:#e8e8ea}
+  .cb2-c2 .cb2-txt{top:calc(var(--u)*38)}
+  .cb2-ver{position:absolute;left:calc(var(--u)*20);bottom:calc(var(--u)*10);font-size:calc(var(--u)*12.5);color:#8a8a90}
+  .cb2-note{left:calc(var(--u)*653);top:calc(var(--u)*207);width:calc(var(--u)*242);height:calc(var(--u)*76);padding:calc(var(--u)*13) calc(var(--u)*14);border-radius:calc(var(--u)*2);background:#91c0ea;color:#0e1a26;font-size:calc(var(--u)*13);line-height:1.25}
   .vc-mbimg{position:absolute;left:calc(var(--u)*108);top:calc(var(--u)*139);width:calc(var(--u)*321);padding:calc(var(--u)*15) calc(var(--u)*15) calc(var(--u)*13.5);border:1px solid rgba(255,255,255,0.13);border-radius:calc(var(--u)*10);background:#000}
   .vc-mbimg .dv-ghost-img{height:calc(var(--u)*200);border-radius:calc(var(--u)*8)}
   /* Discussion: composer centred and larger (no Create button); the post takes its place once created */
@@ -625,35 +643,13 @@
     <div class="vc-col"><div class="vc-stack">
 <article data-k="collab" class="dv-card dv-card-collab" aria-label="Collaboration">
             <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><rect x="2.5" y="6" width="5" height="12" rx="2.5"/><rect x="9.5" y="3" width="5" height="18" rx="2.5"/><rect x="16.5" y="5" width="5" height="10" rx="2.5"/></svg></span><span class="dv-label">Collaboration</span></div><span class="vc-peek" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.7 8 3.7 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.5 0 5.5 3.5 4.4 6.7-1.7 4.7-9.2 9.3-9.2 9.3z" fill="#5aa0ff"/><path d="M16.2 7.2c1.2.3 2 1.2 2.1 2.4" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg></span>
-            <div class="cb-ui" aria-hidden="true">
-              <svg class="cb-flow" viewBox="0 0 980 640" aria-hidden="true"><g fill="none" stroke="#5a5a5e" stroke-width="2"><rect vector-effect="non-scaling-stroke" x="130" y="96" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="210" y="170" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="104" y="244" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="190" y="318" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M268.0,154 A7,7 0 0 1 275.0,161 L275.0,163 A7,7 0 0 1 268.0,170 L304.0,170 A7,7 0 0 1 297.0,163 L297.0,161 A7,7 0 0 1 304.0,154 Z"/><path vector-effect="non-scaling-stroke" d="M255.0,228 A7,7 0 0 1 262.0,235 L262.0,237 A7,7 0 0 1 255.0,244 L291.0,244 A7,7 0 0 1 284.0,237 L284.0,235 A7,7 0 0 1 291.0,228 Z"/><path vector-effect="non-scaling-stroke" d="M245.0,302 A7,7 0 0 1 252.0,309 L252.0,311 A7,7 0 0 1 245.0,318 L281.0,318 A7,7 0 0 1 274.0,311 L274.0,309 A7,7 0 0 1 281.0,302 Z"/><g class="cb-anim"><rect vector-effect="non-scaling-stroke" x="104" y="392" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M245.0,376 A7,7 0 0 1 252.0,383 L252.0,385 A7,7 0 0 1 245.0,392 L281.0,392 A7,7 0 0 1 274.0,385 L274.0,383 A7,7 0 0 1 281.0,376 Z"/></g></g><g fill="#141415"><rect vector-effect="non-scaling-stroke" x="130" y="96" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="210" y="170" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="104" y="244" width="232" height="58" rx="18"/><rect vector-effect="non-scaling-stroke" x="190" y="318" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M268.0,154 A7,7 0 0 1 275.0,161 L275.0,163 A7,7 0 0 1 268.0,170 L304.0,170 A7,7 0 0 1 297.0,163 L297.0,161 A7,7 0 0 1 304.0,154 Z"/><path vector-effect="non-scaling-stroke" d="M255.0,228 A7,7 0 0 1 262.0,235 L262.0,237 A7,7 0 0 1 255.0,244 L291.0,244 A7,7 0 0 1 284.0,237 L284.0,235 A7,7 0 0 1 291.0,228 Z"/><path vector-effect="non-scaling-stroke" d="M245.0,302 A7,7 0 0 1 252.0,309 L252.0,311 A7,7 0 0 1 245.0,318 L281.0,318 A7,7 0 0 1 274.0,311 L274.0,309 A7,7 0 0 1 281.0,302 Z"/><rect vector-effect="non-scaling-stroke" x="273.0" y="150" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="273.0" y="168" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="260.0" y="224" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="260.0" y="242" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="250.0" y="298" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="250.0" y="316" width="26" height="6"/><g class="cb-anim"><rect vector-effect="non-scaling-stroke" x="104" y="392" width="232" height="58" rx="18"/><path vector-effect="non-scaling-stroke" d="M245.0,376 A7,7 0 0 1 252.0,383 L252.0,385 A7,7 0 0 1 245.0,392 L281.0,392 A7,7 0 0 1 274.0,385 L274.0,383 A7,7 0 0 1 281.0,376 Z"/><rect vector-effect="non-scaling-stroke" x="250.0" y="372" width="26" height="6"/><rect vector-effect="non-scaling-stroke" x="250.0" y="390" width="26" height="6"/></g></g></svg><span class="cb-stage" style="left:calc(var(--u)*154);top:calc(var(--u)*96)">Brainstorm</span><span class="cb-stage" style="left:calc(var(--u)*234);top:calc(var(--u)*170)">Sketch</span><span class="cb-stage" style="left:calc(var(--u)*128);top:calc(var(--u)*244)">Model</span><span class="cb-stage" style="left:calc(var(--u)*214);top:calc(var(--u)*318)">Rig</span><span class="cb-stage cb-anim" style="left:calc(var(--u)*128);top:calc(var(--u)*392)">Animation</span><span class="cb-add" style="left:calc(var(--u)*104);top:calc(var(--u)*392)"><svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f4" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add stage</span><span class="cb-new" style="left:calc(var(--u)*104);top:calc(var(--u)*392)"><span class="cb-new-ph">Stage name</span><span class="cb-new-t"></span><span class="ds-caret cb-new-c"></span></span>
-              <div class="cb-right">
-                <p class="cb-h">Keep your projects private or publish them to the wider creative community.</p><p class="cb-h">Exchange feedback, track progress and keep everyone on the same page.</p><p class="cb-h">Keep all important project<br>conversations in one place.</p><p class="cb-h">Manage project activity, see who’s working<br>on what and stay up to date.</p>
-                <div class="cb-tabs"><span class="cb-pill"></span><span class="cb-tab">Project</span><span class="cb-tab">Feedback</span><span class="cb-tab">Discussions</span><span class="cb-tab">Activity</span></div>
-                <div class="cb-panel"><div class="cb-pane" data-i="0">
-  <div class="cb-box cb-intro"><div class="cb-k">INTRODUCTION</div><div class="cb-v">Team animation project- short film</div><span class="cb-edit"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M3 17.3V21h3.7L17.8 9.9l-3.7-3.7zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7z"/></svg>Edit</span></div>
-  <div class="cb-box cb-status"><div class="cb-k">STATUS</div><div class="cb-grid"><span class="cb-cell"><span>To do</span><b class="cb-todo">1</b></span><span class="cb-cell"><span>In progress</span><b class="cb-prog">1</b></span><span class="cb-cell"><span>In review</span><b class="cb-rev">1</b></span><span class="cb-cell"><span>Changes</span><b class="">1</b></span><span class="cb-cell"><span>Approved</span><b class="">1</b></span></div></div>
-</div>
-<div class="cb-pane" data-i="1">
-  <div class="cb-filt"><span data-on="1">Open</span><span>Resolved</span><span>All</span></div>
-  <div class="cb-msg cb-pop">
-    <div class="cb-row"><span class="cb-av"></span><span class="cb-n">Demetrios</span><span class="cb-g">just now</span><span class="cb-dots">•••</span></div>
-    <div class="cb-in"><span class="cb-tag">v1</span><div class="cb-t">Can we get a new iteration of this?</div>
-      <div class="cb-acts"><span><svg viewBox="0 0 24 24" fill="#c8c8cc"><path d="M12 2l4 10-4 10-4-10z"/></svg>Go to</span><span>Reply</span><span><svg viewBox="0 0 24 24" fill="none" stroke="#c8c8cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>Resolve</span></div></div>
-  </div>
-</div>
-<div class="cb-pane" data-i="2">
-  <div class="cb-dhead"><svg viewBox="0 0 24 24" fill="none" stroke="#f2f2f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>Animation- Short Film</span><svg class="cb-bin" viewBox="0 0 24 24" fill="#a3a3a6"><path d="M9 3h6l1 2h4v2H4V5h4zM6 9h12l-1 12H7z"/></svg></div>
-  <div class="cb-msg cb-pop"><div class="cb-row"><span class="cb-av"></span><span class="cb-n">Abi</span><span class="cb-g">just now</span></div><div class="cb-in cb-t">Hey, are you working on this?</div></div>
-</div>
-<div class="cb-pane" data-i="3">
-  <div class="cb-act cb-pop"><span class="cb-av"></span><span><span class="cb-n">Abi</span> <span class="cb-g">uploaded</span> <span class="cb-n">Sketch v1</span> <span class="cb-g">just now</span></span></div>
-  <div class="cb-act cb-pop"><span class="cb-av"></span><span><span class="cb-n">Demetrios</span> <span class="cb-g">commented</span> <span class="cb-n">Sketch v1</span> <span class="cb-g">just now</span></span></div>
-</div></div>
-              </div>
+            <div class="cb2" aria-hidden="true">
+              <svg class="cb2-svg" viewBox="0 0 980 560" preserveAspectRatio="none"><path class="cb2-line" pathLength="1" d="M376 278 C451.5 278, 451.5 106, 527 106"/><path class="cb2-line" pathLength="1" d="M376 323 C514.5 323, 514.5 247, 653 247"/><path class="cb2-line" pathLength="1" d="M376 343 C498.5 343, 498.5 457, 621 457"/></svg>
+              <div class="cb2-img"></div><span class="cb2-v">V1</span>
+              <div class="cb2-item cb2-c cb2-c1"><span class="cb2-av"></span><span class="cb2-name">Demetrios</span><span class="cb2-when">just now</span><p class="cb2-txt">Can we see a new iteration of this?</p><span class="cb2-ver">v1</span></div>
+              <div class="cb2-item cb2-note">Update with new version and try out a different font</div>
+              <div class="cb2-item cb2-c cb2-c2"><span class="cb2-av"></span><span class="cb2-name">Abi</span><span class="cb2-when">just now</span><p class="cb2-txt">Can we change the font?</p><span class="cb2-ver">v1</span></div>
             </div>
-            <p class="dv-cap cb-cap">Create shared workspaces for your projects or collaborations.</p><p class="dv-cap cb-cap">Work together, every step of the way.</p><p class="dv-cap cb-cap">Discuss project ideas, share your vision, align on creative direction.</p><p class="dv-cap cb-cap">Stay up to date with progress,<br>updates and changes as they happen.</p>
-            <p class="dv-cap cb-cap0">Working on a group project or creative collaboration?</p>
           </article>
 <article data-k="disc" class="dv-card" aria-label="Discussion">
             <div class="dv-head"><span class="dv-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f2f2f4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span class="dv-label">Discussion</span></div><span class="vc-peek" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5c-5 0-9 3.3-9 7.4 0 2.2 1.1 4.1 2.9 5.5L5 20.5l4.6-2.3c.8.2 1.6.3 2.4.3 5 0 9-3.3 9-7.4S17 3.5 12 3.5z" fill="#f2f2f4"/><circle cx="8" cy="11" r="1.3" fill="#111"/><circle cx="12" cy="11" r="1.3" fill="#111"/><circle cx="16" cy="11" r="1.3" fill="#111"/><circle cx="19.6" cy="4.6" r="2.6" fill="#5aa0ff" stroke="#000" stroke-width="1"/></svg></span>
