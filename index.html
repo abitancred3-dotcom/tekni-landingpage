@@ -645,6 +645,17 @@
     .pf-cards{flex-direction:column;gap:calc(var(--u)*44)}
     .pf-card{--c:calc(var(--u) * 880 / 392);--ch:420;--tt:70;--th:200;--ut:110}
   }
+
+  /* ---------- "You focus on creating." strip above the footer ---------- */
+  #focus{background:#000;padding:clamp(48px,6vw,96px) clamp(20px,2.4vw,44px) clamp(56px,7vw,110px)}
+  .fc-wrap{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);align-items:start}
+  .fc-h{margin:0;font-size:clamp(28px,2.6vw,46px);font-weight:600;line-height:1.15;letter-spacing:-0.01em;color:#fff}
+  .fc-chips{display:flex;flex-wrap:wrap;gap:clamp(8px,0.75vw,14px);margin-top:clamp(18px,1.6vw,26px)}
+  .fc-chip{display:inline-flex;align-items:center;justify-content:center;min-width:clamp(110px,9vw,170px);height:clamp(38px,2.8vw,46px);padding:0 clamp(14px,1.2vw,22px);border-radius:9px;border:1px solid rgba(255,255,255,0.13);background:#050505;color:#f2f2f4;font-size:clamp(15px,1.15vw,19px);font-weight:400;white-space:nowrap}
+  @media (max-width:760px){
+    .fc-wrap{grid-template-columns:1fr;gap:clamp(28px,8vw,44px)}
+    .fc-chip{min-width:0}
+  }
 </style>
 </helmet>
 
@@ -973,6 +984,15 @@
     <div class="cr-row cr-row1"><div class="cr-track"><div class="cr-set"><span class="cr-pill">Graphic designers</span><span class="cr-pill cr-pink">Brand designers</span><span class="cr-pill">Digital artists</span><span class="cr-pill">Illustrators</span><span class="cr-pill cr-green">UX/UI designers</span><span class="cr-pill">Traditional artists</span><span class="cr-pill">Product designers</span><span class="cr-pill cr-blue">3D artists</span><span class="cr-pill">Painters</span><span class="cr-pill">Fashion designers</span><span class="cr-pill cr-lilac">Character designers</span><span class="cr-pill">Textile artists</span></div><div class="cr-set" aria-hidden="true"><span class="cr-pill">Graphic designers</span><span class="cr-pill cr-pink">Brand designers</span><span class="cr-pill">Digital artists</span><span class="cr-pill">Illustrators</span><span class="cr-pill cr-green">UX/UI designers</span><span class="cr-pill">Traditional artists</span><span class="cr-pill">Product designers</span><span class="cr-pill cr-blue">3D artists</span><span class="cr-pill">Painters</span><span class="cr-pill">Fashion designers</span><span class="cr-pill cr-lilac">Character designers</span><span class="cr-pill">Textile artists</span></div></div></div>
     <div class="cr-row cr-row2"><div class="cr-track"><div class="cr-set"><span class="cr-pill cr-rose">Web designers</span><span class="cr-pill">Concept artists</span><span class="cr-pill">Sculptors</span><span class="cr-pill cr-yellow">Motion designers</span><span class="cr-pill">Ceramicists</span><span class="cr-pill">Industrial designers</span><span class="cr-pill cr-pink">2D animators</span><span class="cr-pill">Tattoo artists</span><span class="cr-pill">Interior designers</span><span class="cr-pill cr-green">3D animators</span><span class="cr-pill">Printmakers</span></div><div class="cr-set" aria-hidden="true"><span class="cr-pill cr-rose">Web designers</span><span class="cr-pill">Concept artists</span><span class="cr-pill">Sculptors</span><span class="cr-pill cr-yellow">Motion designers</span><span class="cr-pill">Ceramicists</span><span class="cr-pill">Industrial designers</span><span class="cr-pill cr-pink">2D animators</span><span class="cr-pill">Tattoo artists</span><span class="cr-pill">Interior designers</span><span class="cr-pill cr-green">3D animators</span><span class="cr-pill">Printmakers</span></div></div></div>
     <div class="cr-row cr-row3"><div class="cr-track"><div class="cr-set"><span class="cr-pill">Packaging designers</span><span class="cr-pill">Mural artists</span><span class="cr-pill cr-blue">Craft makers</span><span class="cr-pill">Game artists</span><span class="cr-pill">Game designers</span><span class="cr-pill cr-lilac">3D modellers</span><span class="cr-pill">CGI artists</span><span class="cr-pill">VFX artists</span><span class="cr-pill cr-rose">Character animators</span><span class="cr-pill">Textile designers</span><span class="cr-pill">Type designers</span></div><div class="cr-set" aria-hidden="true"><span class="cr-pill">Packaging designers</span><span class="cr-pill">Mural artists</span><span class="cr-pill cr-blue">Craft makers</span><span class="cr-pill">Game artists</span><span class="cr-pill">Game designers</span><span class="cr-pill cr-lilac">3D modellers</span><span class="cr-pill">CGI artists</span><span class="cr-pill">VFX artists</span><span class="cr-pill cr-rose">Character animators</span><span class="cr-pill">Textile designers</span><span class="cr-pill">Type designers</span></div></div></div>
+  </div>
+</section>
+<section id="focus" aria-label="You focus on creating">
+  <div class="fc-wrap">
+    <h2 class="fc-h">You focus on creating.</h2>
+    <div>
+      <h2 class="fc-h">We'll help you share it.</h2>
+      <div class="fc-chips"><span class="fc-chip">Community</span><span class="fc-chip">Inspiration</span><span class="fc-chip">Discovery</span><span class="fc-chip">Moodboards</span><span class="fc-chip">Shared Workspaces</span><span class="fc-chip">Customisation</span><span class="fc-chip">Collaboration</span><span class="fc-chip">Portfolio</span></div>
+    </div>
   </div>
 </section>
 <footer style="border-top:1px solid var(--line);padding:52px 44px 36px">
