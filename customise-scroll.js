@@ -142,11 +142,11 @@
     spinTarget = Math.PI / 2 + (enter - 1) * 0.9 + P * Math.PI * 2 * 1.5;
     if (!modelStarted && r.top < vh * 2) { modelStarted = true; initModel(); }
 
-    screenScene(sec, sNew, portrait);
+    // the zoom-out into a screen is retired: the section ends once the dot settles on pink
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 270;
+  const S_END = 200;
   const D = 80;   // the add-image steps run this much later, after the pixel lettering
   let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, panels = [], menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
