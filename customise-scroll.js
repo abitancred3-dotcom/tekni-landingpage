@@ -146,7 +146,7 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 470;
+  const S_END = 270;
   const D = 80;   // the add-image steps run this much later, after the pixel lettering
   let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, panels = [], menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
@@ -328,15 +328,14 @@
       const y0 = oy + (L.box.y0 - L.bcy) * sc - py, y1 = oy + (L.box.y1 - L.bcy) * sc + py;
       fr.style.left = U(x0); fr.style.top = U(y0); fr.style.width = U(x1 - x0); fr.style.height = U(y1 - y0);
       // the outer screen box fades away together with the cube grid once the panels are drawn
-      fr.style.opacity = (easeOut(seg(z, 0.15, 0.85)) * (1 - smooth(seg(sv, 400, 422)))).toFixed(3);
+      fr.style.opacity = easeOut(seg(z, 0.15, 0.85)).toFixed(3);
     }
     const rise = (k) => 'translate3d(0,' + U((1 - easeOut(k)) * 18) + ',0)';
     const ck = seg(sv, 226, 246);
     set($('cz-cap'), easeOut(ck), rise(ck));
 
     // tiny cubes flip in across the screen, then some light up to spell "Make it your own." in pixels
-    drawPixels(L, sv);
-    panelScene(L, sv);
+    // the cube grid, title and panels steps are retired: the section ends on the zoomed-out screen in its box
     const title = document.getElementById('cz-title');
     if (title) title.querySelectorAll('.cz-tw').forEach((w, i) => {
       const k = seg(sv, 292 + i * 6, 301 + i * 6), e = easeOut(k);
