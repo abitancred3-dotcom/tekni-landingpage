@@ -623,6 +623,9 @@
   .pf-p{margin:calc(var(--u)*2) 0 0;font-weight:300;color:#d2d2d4}
   .pf-cards{display:flex;gap:calc(var(--u)*44);flex:none}
   .pf-card{position:relative;flex:none;--c:var(--u);--ch:390;--tt:79;--th:179;width:calc(var(--c)*392);height:calc(var(--c)*var(--ch));border-radius:calc(var(--c)*16);border:1.5px solid rgba(255,255,255,0.14);background:#050505;overflow:hidden;opacity:0;will-change:transform,opacity}
+  /* hover: the card lifts a little (uses `translate`, so it stacks on the scroll-driven transform) */
+  .pf-card{translate:0 0;transition:translate 280ms cubic-bezier(.2,.8,.2,1),border-color 280ms ease,box-shadow 280ms ease,background-color 280ms ease}
+  @media (hover:hover){.pf-card:hover{translate:0 calc(var(--c) * -10);border-color:rgba(255,255,255,0.26);background-color:#0b0b0b;box-shadow:0 calc(var(--c) * 18) calc(var(--c) * 40) rgba(0,0,0,0.55)}}
   .pf-cap{position:absolute;left:calc(var(--c)*26);right:calc(var(--c)*26);bottom:calc(var(--c)*44);margin:0;font-size:calc(var(--c)*19.5);font-weight:400;line-height:1.25;color:#e8e8ea}
   .pf-tile{position:absolute;left:0;top:calc(var(--c)*var(--tt));width:calc(var(--c)*99);height:calc(var(--c)*var(--th));border-radius:calc(var(--c)*10);background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);will-change:transform}
   .pf-chip{position:absolute;right:calc(var(--c)*80);width:calc(var(--c)*107);height:calc(var(--c)*34);border-radius:calc(var(--c)*6);background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);color:#a9a9ad;font-size:calc(var(--c)*14.5);display:flex;align-items:center;justify-content:center;white-space:nowrap}
