@@ -146,7 +146,7 @@
   }
 
   // ---------- 5. zoom out into a screen, then grey tiles flip in one by one ----------
-  const S_END = 650;
+  const S_END = 470;
   const D = 80;   // the add-image steps run this much later, after the pixel lettering
   let layoutKey = '', L5 = null, gridKey = '', tiles = [], plusEl = null, backEl = null, plusBk = null, pixCv = null, panels = [], menuEl = null, imgEl = null, handleEl = null, imgRow = null;
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layoutKey = ''; });
@@ -204,7 +204,7 @@
 
     // tile grid: one even gap between every tile, one even border on all four sides;
     // plus tile spans the last 3 rows of the last column
-    const B = 1.5, inset = 14, K = 6;
+    const B = 1.5, inset = 14, K = 4;
     const ix = fx + B + inset, iy = fy + B + inset, iw = fw - 2 * (B + inset), ih = fh - 2 * (B + inset);
     // the fine cube grid fills the inner area exactly (same border on all four sides); the big cells used by the
     // plus box and the image box are K x K blocks of it, so everything lines up with the cubes
@@ -312,7 +312,7 @@
     if (!L) return;
     const $ = id => document.getElementById(id);
     // zoom out: content shrinks into the frame position
-    const z = easeIO(seg(sv, 196, 248));
+    const z = easeIO(seg(sv, 196, 236));
     const sc = 1 + (L.s - 1) * z;
     const zoom = $('cz-zoom');
     if (zoom) {
@@ -328,10 +328,10 @@
       const y0 = oy + (L.box.y0 - L.bcy) * sc - py, y1 = oy + (L.box.y1 - L.bcy) * sc + py;
       fr.style.left = U(x0); fr.style.top = U(y0); fr.style.width = U(x1 - x0); fr.style.height = U(y1 - y0);
       // the outer screen box fades away together with the cube grid once the panels are drawn
-      fr.style.opacity = (easeOut(seg(z, 0.15, 0.85)) * (1 - smooth(seg(sv, 528, 560)))).toFixed(3);
+      fr.style.opacity = (easeOut(seg(z, 0.15, 0.85)) * (1 - smooth(seg(sv, 400, 422)))).toFixed(3);
     }
     const rise = (k) => 'translate3d(0,' + U((1 - easeOut(k)) * 18) + ',0)';
-    const ck = seg(sv, 236, 262);
+    const ck = seg(sv, 226, 246);
     set($('cz-cap'), easeOut(ck), rise(ck));
 
     // tiny cubes flip in across the screen, then some light up to spell "Make it your own." in pixels
@@ -339,7 +339,7 @@
     panelScene(L, sv);
     const title = document.getElementById('cz-title');
     if (title) title.querySelectorAll('.cz-tw').forEach((w, i) => {
-      const k = seg(sv, 356 + i * 9, 368 + i * 9), e = easeOut(k);
+      const k = seg(sv, 292 + i * 6, 301 + i * 6), e = easeOut(k);
       w.style.opacity = e.toFixed(3);
       w.style.transform = 'translate3d(0,' + U((1 - e) * 22) + ',0)';
       w.style.filter = k > 0 && k < 1 ? 'blur(' + ((1 - e) * 6).toFixed(2) + 'px)' : '';
@@ -367,22 +367,22 @@
     const cellX = c => X0 + c * M.mpx, cellY = r => Y0 + r * M.mpy;
     const R = Math.min(M.mpx, M.mpy) * 1.05;
     // phones: the three panels stack as rows so their text has room
-    const gapR = 1, phR = Math.floor((MR - 3 - (N - 1) * gapR) / N);
+    const gapR = 1, phR = Math.floor((MR - 2 - (N - 1) * gapR) / N);
     panels.forEach((p, i) => {
       let c0 = mX + Math.floor(extra / 2) + i * (pw + gapC), c1 = c0 + pw - 1, pr0 = r0, pr1 = r1;
       if (portrait) { c0 = mX; c1 = MC - mX - 1; pr0 = 1 + i * (phR + gapR); pr1 = pr0 + phR - 1; }
-      const s0 = 405 + i * 40;
-      const a = seg(sv, s0, s0 + 6), d = easeIO(seg(sv, s0 + 6, s0 + 32)), e = smooth(seg(sv, s0 + 32, s0 + 40));
+      const s0 = 322 + i * 26;
+      const a = seg(sv, s0, s0 + 4), d = easeIO(seg(sv, s0 + 4, s0 + 20)), e = smooth(seg(sv, s0 + 20, s0 + 26));
       const x = cellX(c0), y = cellY(pr0);
       const fullW = cellX(c1) + cs - x, fullH = cellY(pr1) + ch - y;
       const startW = cellX(c0 + 2) + cs - x, startH = cellY(pr0 + 2) + ch - y;
       // copy fades in, line by line, once the grid behind has faded away
       if (p.body) {
         p.body.style.setProperty('--pw', fullW.toFixed(1));
-        p.body.style.setProperty('--fs', portrait ? '1.3' : '1');
+        p.body.style.setProperty('--fs', portrait ? '1.22' : '1');
         const lines = p.body.children;
         for (let j = 0; j < lines.length; j++) {
-          const k = seg(sv, 552 + i * 9 + j * 6, 566 + i * 9 + j * 6), e2 = easeOut(k);
+          const k = seg(sv, 420 + i * 6 + j * 4, 430 + i * 6 + j * 4), e2 = easeOut(k);
           const st2 = lines[j].style;
           st2.opacity = e2.toFixed(3);
           st2.transform = 'translate3d(0,' + U((1 - e2) * 16) + ',0)';
@@ -403,8 +403,8 @@
       const ds = p.dot.style, dd = Math.min(M.mpx, M.mpy) * 0.9;
       ds.width = U(dd); ds.height = U(dd);
       ds.left = U(x + w - ci); ds.top = U(y + h - ci);
-      const act = seg(sv, s0 + 6, s0 + 9) * (1 - seg(sv, s0 + 29, s0 + 32));
-      ds.opacity = (easeOut(seg(sv, s0 + 3, s0 + 7)) * (1 - e)).toFixed(3);
+      const act = seg(sv, s0 + 4, s0 + 6) * (1 - seg(sv, s0 + 18, s0 + 20));
+      ds.opacity = (easeOut(seg(sv, s0 + 2, s0 + 5)) * (1 - e)).toFixed(3);
       ds.visibility = a > 0 && e < 1 ? 'visible' : 'hidden';
       ds.background = 'color-mix(in srgb, var(--cz-acc) ' + (act * 100).toFixed(1) + '%, #0c0c0c)';
       ds.transform = 'translate(-50%,-50%) scale(' + (1 + 0.15 * act).toFixed(3) + ')';
@@ -459,11 +459,11 @@
     const g = pixCv.getContext('2d');
     g.setTransform(dpr * u, 0, 0, dpr * u, 0, 0);   // draw in design units
     g.clearRect(0, 0, M.bw2, M.bh2);
-    const tp = seg(sv, 262, 352), Wd = 0.12;
+    const tp = seg(sv, 240, 290), Wd = 0.12;
     if (tp <= 0) return;
     const type = seg(sv, 358, 420), fade = smooth(seg(sv, 442, 462));
     // after the three panels are drawn, the cube grid fades out from behind them
-    const gridOn = 1 - smooth(seg(sv, 528, 560));
+    const gridOn = 1 - smooth(seg(sv, 400, 422));
     const cs = M.mpx - M.mg, ch = M.mpy - M.mg, rad = Math.min(cs, ch) * 0.24;
     const LIT = '#f2f2f4';   // the soft white used for text across the site
     for (let r = 0; r < M.MR; r++) {
