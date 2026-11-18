@@ -85,14 +85,14 @@
       rise(text, seg(enter, 0.3, 0.75), 30);
       cards.forEach((c, i) => rise(c, seg(enter, 0.4 + i * 0.09, 0.8 + i * 0.09), 40));
       const p = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1);
-      SCENES.forEach((f, i) => f(cards[i], seg(p, 0.04 + i * 0.3, 0.3 + i * 0.3)));
+      SCENES.forEach((f, i) => f(cards[i], seg(p, 0.02 + i * 0.29, 0.34 + i * 0.29)));
     } else {
       // phones: normal flow, each card rises in and plays as it reaches the middle of the screen
       const vis = el => (vh - el.getBoundingClientRect().top) / vh;
       rise(text, seg(vis(text), 0.05, 0.3), 24);
       cards.forEach((c, i) => {
         rise(c, seg(vis(c), 0.05, 0.3), 30);
-        SCENES[i](c, clamp((vh * 0.5 - tops[i]) / (vh * 0.35), 0, 1));
+        SCENES[i](c, clamp((vh * 0.55 - tops[i]) / (vh * 0.25), 0, 1));
       });
     }
   }
