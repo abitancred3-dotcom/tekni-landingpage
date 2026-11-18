@@ -18,7 +18,7 @@
 <script src="./customise-scroll.js?v=42409946be"></script>
 <script src="./discover-scroll.js?v=f8383738e3"></script>
 <script src="./finalpost-scroll.js?v=d95e923153"></script>
-<script src="./portfolio-scroll.js?v=4473f5c99c"></script>
+<script src="./portfolio-scroll.js?v=4085f85f9f"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -611,7 +611,7 @@
   }
 
   /* ---------- Portfolio: make it your own ---------- */
-  #portfolio{position:relative;height:220vh;background:#000}
+  #portfolio{position:relative;height:320vh;background:#000}
   .pf-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
   .pf-stage{position:relative;flex:none;width:min(100vw,177.78vh);--u:calc(min(100vw,177.78vh) / 2000);display:flex;align-items:center;gap:calc(var(--u)*70);padding:0 calc(var(--u)*70);box-sizing:border-box}
   .pf-stage *{box-sizing:border-box}
@@ -622,19 +622,19 @@
   .pf-sub{margin:calc(var(--u)*22) 0 0;font-weight:600;color:#fff}
   .pf-p{margin:calc(var(--u)*2) 0 0;font-weight:300;color:#d2d2d4}
   .pf-cards{display:flex;gap:calc(var(--u)*44);flex:none}
-  .pf-card{position:relative;flex:none;--c:var(--u);--ch:480;--tt:96;--th:228;--ut:150;width:calc(var(--c)*392);height:calc(var(--c)*var(--ch));border-radius:calc(var(--c)*16);border:1.5px solid rgba(255,255,255,0.14);background:#050505;overflow:hidden;opacity:0;will-change:transform,opacity}
-  .pf-cap{position:absolute;left:calc(var(--c)*26);right:calc(var(--c)*26);bottom:calc(var(--c)*40);margin:0;font-size:calc(var(--c)*22);font-weight:400;line-height:1.25;color:#e8e8ea}
-  .pf-tile{position:absolute;left:0;top:calc(var(--c)*var(--tt));width:calc(var(--c)*99);height:calc(var(--c)*var(--th));border-radius:calc(var(--c)*9);background:#2e2e30;will-change:transform}
-  .pf-ui{position:absolute;left:calc(var(--c)*106);top:calc(var(--c)*var(--ut));width:calc(var(--c)*245);height:calc(var(--c)*99);background:#0a0a0a}
-  .pf-cell{position:absolute;top:calc(var(--c)*54);width:calc(var(--c)*62);height:calc(var(--c)*45);border:1px solid rgba(255,255,255,0.05);border-bottom:0}
-  .pf-line{position:absolute;left:calc(var(--c)*183);top:0;bottom:0;width:1px;background:rgba(255,255,255,0.2);z-index:2}
-  .pf-input{position:absolute;left:calc(var(--c)*6);top:calc(var(--c)*11);width:calc(var(--c)*229);height:calc(var(--c)*40);border-radius:calc(var(--c)*7);border:1px solid rgba(255,255,255,0.12);background:#141414;display:flex;align-items:center;padding-left:calc(var(--c)*12);font-size:calc(var(--c)*14);color:#77777b}
-  .pf-ok,.pf-x{position:absolute;top:calc(var(--c)*7);width:calc(var(--c)*26);height:calc(var(--c)*26);border-radius:calc(var(--c)*6);display:grid;place-items:center}
-  .pf-ok{right:calc(var(--c)*40);background:rgba(234,59,108,0.3)}
-  .pf-x{right:calc(var(--c)*8)}
-  .pf-ok svg,.pf-x svg{width:calc(var(--c)*14);height:calc(var(--c)*14)}
-  .pf-add{position:absolute;left:calc(var(--c)*139);top:calc(var(--c)*60);width:calc(var(--c)*98);height:calc(var(--c)*35);border-radius:calc(var(--c)*7);border:1px solid rgba(255,255,255,0.1);background:#161616;color:#e08aa3;font-size:calc(var(--c)*13);display:flex;align-items:center;justify-content:center;gap:calc(var(--c)*7)}
-  .pf-add svg{width:calc(var(--c)*10);height:calc(var(--c)*10)}
+  .pf-card{position:relative;flex:none;--c:var(--u);--ch:390;--tt:79;--th:179;width:calc(var(--c)*392);height:calc(var(--c)*var(--ch));border-radius:calc(var(--c)*16);border:1.5px solid rgba(255,255,255,0.14);background:#050505;overflow:hidden;opacity:0;will-change:transform,opacity}
+  .pf-cap{position:absolute;left:calc(var(--c)*26);right:calc(var(--c)*26);bottom:calc(var(--c)*44);margin:0;font-size:calc(var(--c)*19.5);font-weight:400;line-height:1.25;color:#e8e8ea}
+  .pf-tile{position:absolute;left:0;top:calc(var(--c)*var(--tt));width:calc(var(--c)*99);height:calc(var(--c)*var(--th));border-radius:calc(var(--c)*10);background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);will-change:transform}
+  .pf-chip{position:absolute;right:calc(var(--c)*80);width:calc(var(--c)*107);height:calc(var(--c)*34);border-radius:calc(var(--c)*6);background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);color:#a9a9ad;font-size:calc(var(--c)*14.5);display:flex;align-items:center;justify-content:center;white-space:nowrap}
+  .pf-new{opacity:0;will-change:transform,opacity}
+  .pf-in{position:absolute;left:calc(var(--c)*81);top:calc(var(--c)*195);width:calc(var(--c)*236);height:calc(var(--c)*43);border-radius:calc(var(--c)*8);background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;padding-left:calc(var(--c)*16);font-size:calc(var(--c)*15);color:#ececee;white-space:nowrap}
+  .pf-ph{color:#8c8c90}
+  .pf-caret{display:inline-block;width:1.5px;height:calc(var(--c)*17);background:#ececee;margin-left:1px;opacity:0}
+  .pf-ok,.pf-x{position:absolute;top:calc(var(--c)*8);width:calc(var(--c)*26);height:calc(var(--c)*26);border-radius:calc(var(--c)*6);display:grid;place-items:center;color:#9a9a9e}
+  .pf-ok{left:calc(var(--c)*167)}
+  .pf-x{left:calc(var(--c)*198)}
+  .pf-ok svg,.pf-x svg{width:calc(var(--c)*17);height:calc(var(--c)*17)}
+  .pf-g{position:absolute;width:calc(var(--c)*151);border-radius:calc(var(--c)*10);background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);will-change:top,height}
   @media (max-aspect-ratio:1/1){
     #portfolio{height:auto;padding:calc(100vw * 0.16) 0}
     .pf-sticky{position:relative;height:auto;display:block;overflow:visible}
@@ -643,7 +643,8 @@
     .pf-h{font-size:calc(var(--u)*56)}
     .pf-sub,.pf-p{font-size:calc(var(--u)*36);max-width:none}
     .pf-cards{flex-direction:column;gap:calc(var(--u)*44)}
-    .pf-card{--c:calc(var(--u) * 880 / 392);--ch:420;--tt:70;--th:200;--ut:110}
+    .pf-card{--c:calc(var(--u) * 880 / 392);--ch:420}
+    .pf-cap{bottom:calc(var(--c)*34)}
   }
 
   /* ---------- "You focus on creating." strip above the footer ---------- */
@@ -799,18 +800,16 @@
           <p class="pf-cap">Choose your preferred grid layout to display your in app work.</p>
         </div>
         <div class="pf-card">
-          <div class="pf-ui" aria-hidden="true">
-            <div class="pf-cell" style="left:0"></div><div class="pf-cell" style="left:calc(var(--c)*75)"></div>
-            <div class="pf-input">Tab name
-              <span class="pf-ok" style="color:#f2a7bc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-              <span class="pf-x" style="color:#e8e8ea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
-            </div>
-            <div class="pf-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Add tab</div>
-            <div class="pf-line"></div>
+          <div aria-hidden="true">
+            <span class="pf-chip" style="top:calc(var(--c)*58)">Typography</span>
+            <span class="pf-chip" style="top:calc(var(--c)*103)">Illustration</span>
+            <span class="pf-chip pf-new" style="top:calc(var(--c)*147)">Branding</span>
+            <div class="pf-in"><span class="pf-typed"></span><span class="pf-caret"></span><span class="pf-ph">Tab name</span><span class="pf-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="pf-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div>
           </div>
           <p class="pf-cap">Organise your projects into custom tabs to structure your portfolio grid.</p>
         </div>
         <div class="pf-card">
+          <div class="pf-g" style="left:calc(var(--c)*29);top:calc(var(--c)*37);height:calc(var(--c)*138)"></div><div class="pf-g" style="left:calc(var(--c)*202);top:calc(var(--c)*36);height:calc(var(--c)*84)"></div><div class="pf-g" style="left:calc(var(--c)*29);top:calc(var(--c)*193);height:calc(var(--c)*84)"></div><div class="pf-g" style="left:calc(var(--c)*202);top:calc(var(--c)*137);height:calc(var(--c)*139)"></div>
           <p class="pf-cap">Start with a template or customise your public portfolio from scratch.</p>
         </div>
       </div>
