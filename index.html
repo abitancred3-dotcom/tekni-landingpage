@@ -19,6 +19,7 @@
 <script src="./discover-scroll.js?v=f8383738e3"></script>
 <script src="./finalpost-scroll.js?v=d95e923153"></script>
 <script src="./portfolio-scroll.js?v=f2e9dc68cb"></script>
+<script src="./nav-bar.js?v=59b26c96c4"></script>
 <style>
   :root{
     --font-heading:"Figtree",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif;
@@ -308,6 +309,24 @@
   .tk-nav-item:active::before{background:rgba(255,255,255,0.18)}
   .tk-nav-item:focus-visible{outline:2px solid #fff;outline-offset:2px}
   @media (max-width:760px){.tk-nav{display:none}}
+
+  /* ---------- nav bar: wide on load, the sides slide in once you scroll ---------- */
+  .tk-barwrap{position:fixed;left:0;right:0;top:0;z-index:70;display:flex;justify-content:center;padding:clamp(10px,1.4vw,22px) clamp(12px,3vw,54px) 0;pointer-events:none;box-sizing:border-box}
+  .tk-bar{pointer-events:auto;box-sizing:border-box;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;column-gap:16px;height:72px;padding:0 12px 0 16px;border-radius:16px;background:rgba(11,11,11,0.82);border:1.5px solid rgba(255,255,255,0.09);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+  .tk-bar.tk-ready{transition:max-width .8s cubic-bezier(.65,0,.35,1)}
+  .tk-bar .tk-logo{justify-self:start}
+  .tk-bar .tk-right{justify-self:end;display:flex;align-items:center}
+  .tk-bar .tk-nav{margin:0;padding:5px;gap:0;border-radius:11px;background:#000;border:1px solid rgba(255,255,255,0.12);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;white-space:nowrap}
+  .tk-bar .tk-nav-item{height:36px;padding:0 26px;font-size:16.5px;border-radius:8px}
+  .tk-bar .tk-nav-item::before{border-radius:8px}
+  #tk-ind{position:absolute;top:5px;left:0;height:36px;width:0;border-radius:8px;background:rgba(255,255,255,0.13);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);opacity:0;pointer-events:none;will-change:transform,width,opacity}
+  .tk-bar .tk-start{height:46px;padding:0 22px 0 24px;gap:6px;border-radius:11px;font-size:16.5px;background:#000;border:1px solid rgba(255,255,255,0.14);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;white-space:nowrap}
+  .tk-arrow{width:15px;height:15px;flex:none;transition:transform .45s cubic-bezier(0.65,0,.076,1)}
+  .tk-start:hover .tk-arrow,.tk-start:focus-visible .tk-arrow{transform:translate(2px,-2px)}
+  @media (max-width:760px){
+    .tk-bar{height:60px;grid-template-columns:1fr auto;padding:0 8px 0 12px;border-radius:14px}
+    .tk-bar .tk-start{height:42px;font-size:15px;padding:0 16px 0 18px}
+  }
 
   /* ---------- Discover: horizontal card scroll ---------- */
   /* --u and the stage size are set by discover-scroll.js (same fit as Customise); these are fallbacks */
@@ -769,19 +788,20 @@
 </div>
 
 <div id="info" style="display:{{ infoDisplay }}">
-<div style="position:fixed;left:0;right:0;top:0;z-index:70;display:flex;justify-content:space-between;padding:clamp(14px,2.4vw,34px) clamp(14px,2.4vw,40px);pointer-events:none">
+<div class="tk-barwrap">
+ <div class="tk-bar" id="tk-bar">
   <button onClick="{{ backFromInfo }}" aria-label="Tekni home" class="tk-logo"><img src="tekni-icon-white.svg" alt="Tekni" style="height:34px;width:auto;display:block"></button>
   <nav class="tk-nav" aria-label="Sections">
-    <span id="tk-ind" aria-hidden="true" style="position:absolute;top:4px;left:0;height:34px;width:0;border-radius:10px;background:rgba(255,255,255,0.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);opacity:0;pointer-events:none;will-change:transform,width,opacity"></span>
-    <button type="button" class="tk-nav-item" data-sec="share" onClick="{{ navShare }}"><span>Share</span></button>
-    <button type="button" class="tk-nav-item" data-sec="inspiration" onClick="{{ navInspiration }}"><span>Inspiration</span></button>
-    <button type="button" class="tk-nav-item" data-sec="community" onClick="{{ navConnect }}"><span>Connect</span></button>
-    <button type="button" class="tk-nav-item" data-sec="workspace" onClick="{{ navWorkspace }}"><span>Workspace</span></button>
+    <span id="tk-ind" aria-hidden="true"></span>
+    <button type="button" class="tk-nav-item" data-sec="vc" onClick="{{ navFeatures }}"><span>Features</span></button>
+    <button type="button" class="tk-nav-item" data-sec="portfolio" onClick="{{ navPortfolio }}"><span>Portfolio</span></button>
+    <button type="button" class="tk-nav-item" data-sec="customise" onClick="{{ navCustomise }}"><span>Customise</span></button>
+    <button type="button" class="tk-nav-item" data-sec="community" onClick="{{ navWorkspace }}"><span>Workspace</span></button>
   </nav>
-  <div style="pointer-events:auto;display:flex;align-items:center;gap:8px">
-    <a class="tk-login" href="https://www.tekni.app/" target="_blank" rel="noopener">Log In</a>
-    <a class="tk-start" href="https://www.tekni.app/" target="_blank" rel="noopener">Get Started</a>
+  <div class="tk-right">
+    <a class="tk-start" href="https://www.tekni.app/" target="_blank" rel="noopener">Get Started<svg class="tk-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
   </div>
+ </div>
 </div>
 
 <!-- Features (horizontal) section removed; its card sequences live on in the vertical carousel (#vc) -->
@@ -1596,7 +1616,10 @@ class Component extends DCLogic {
       navInspiration: () => this._navTo('workspace', 2 / 3),
       heroInspiration: () => this._navTo('vc', 0.3),
       navConnect: () => this._navTo('community', 0),
-      navWorkspace: () => this._navTo('workspace', 0),
+      navWorkspace: () => this._navTo('community', 0),
+      navFeatures: () => this._navTo('vc', 0),
+      navPortfolio: () => this._navTo('portfolio', 0),
+      navCustomise: () => this._navTo('customise', 0),
       backFromInfo: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
       pickSignIn: () => this.setState({ mode: 'in' }),
       pickSignUp: () => this.setState({ mode: 'up' }),
