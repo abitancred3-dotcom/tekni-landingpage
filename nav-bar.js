@@ -17,7 +17,9 @@
     const gap = parseFloat(bs.columnGap) || 0;
     const chrome = parseFloat(bs.paddingLeft) + parseFloat(bs.paddingRight) + parseFloat(bs.borderLeftWidth) + parseFloat(bs.borderRightWidth);
     // a little breathing room either side of the links, as in the reference
-    const compact = navW ? Math.ceil(navW + 2 * side + 2 * gap + chrome + 2 * 28) : full;
+    // phones (links hidden): the bar closes in around the logo and Get Started
+    const compact = navW ? Math.ceil(navW + 2 * side + 2 * gap + chrome + 2 * 28)
+      : Math.ceil((logo ? logo.offsetWidth : 0) + (right ? right.scrollWidth : 0) + gap + chrome + 28);
     return { full: Math.round(full), compact: Math.min(Math.round(full), compact) };
   }
   function frame() {
