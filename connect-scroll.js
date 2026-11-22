@@ -29,35 +29,46 @@
     });
     last = '';
   }
-  const ind = { x: 0, w: 0, o: 0, init: false };
+  // Nav highlight: a slider that travels across the nav as you scroll. It rests on a link
+  // while you're inside that section and glides to the next one, tied to the scroll,
+  // as the next section comes up.
+  const ind = { o: 0 };
+  const sm = t => t * t * (3 - 2 * t);
   function navIndicator() {
     const el = document.getElementById('tk-ind');
     if (!el || !el.parentElement) return;
     const nav = el.parentElement;
     if (!nav.offsetParent) return;
     const vh = window.innerHeight;
-    let target = null, best = 0;
+    const items = [], starts = [];
     nav.querySelectorAll('.tk-nav-item[data-sec]').forEach(btn => {
       const s = document.getElementById(btn.dataset.sec);
       if (!s) return;
-      const r = s.getBoundingClientRect();
-      const vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-      if (vis > vh * 0.35 && vis > best) { best = vis; target = btn; }
+      items.push(btn); starts.push(s.getBoundingClientRect().top);
     });
-    const tx = target ? target.offsetLeft : ind.x;
-    const tw = target ? target.offsetWidth : ind.w;
-    const to = target ? 1 : 0;
-    if (!ind.init && target) { ind.x = tx; ind.w = tw; ind.init = true; }
-    const k = 0.16;
-    ind.x += (tx - ind.x) * k; ind.w += (tw - ind.w) * k; ind.o += (to - ind.o) * 0.12;
-    if (Math.abs(tx - ind.x) < 0.1) ind.x = tx;
-    if (Math.abs(tw - ind.w) < 0.1) ind.w = tw;
-    el.style.transform = 'translate3d(' + ind.x.toFixed(2) + 'px,0,0)';
-    el.style.width = ind.w.toFixed(2) + 'px';
+    if (!items.length) return;
+    const lastSec = document.getElementById(items[items.length - 1].dataset.sec);
+    const end = lastSec.getBoundingClientRect().bottom;
+    // fractional position along the links
+    // each later section adds 0..1 as its top rises from 85% to 35% of the screen
+    let f = 0;
+    for (let i = 1; i < items.length; i++) {
+      const k = Math.min(1, Math.max(0, (vh * 0.85 - starts[i]) / (vh * 0.5)));
+      f += sm(k);
+    }
+    const i0 = Math.min(items.length - 1, Math.floor(f)), i1 = Math.min(items.length - 1, i0 + 1), t = f - i0;
+    const x = items[i0].offsetLeft + (items[i1].offsetLeft - items[i0].offsetLeft) * t;
+    const w = items[i0].offsetWidth + (items[i1].offsetWidth - items[i0].offsetWidth) * t;
+    // shown from when the first section arrives until the last one has gone
+    const on = starts[0] < vh * 0.6 && end > vh * 0.4 ? 1 : 0;
+    ind.o += (on - ind.o) * 0.14;
+    if (Math.abs(on - ind.o) < 0.002) ind.o = on;
+    el.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+    el.style.width = w.toFixed(2) + 'px';
     el.style.opacity = ind.o.toFixed(3);
-    nav.querySelectorAll('.tk-nav-item').forEach(b => {
-      const on = b === target;
-      if (on) b.setAttribute('aria-current', 'location'); else b.removeAttribute('aria-current');
+    const cur = on ? items[Math.round(f)] : null;
+    nav.querySelectorAll('.tk-nav-item').forEach(btn => {
+      if (btn === cur) btn.setAttribute('aria-current', 'location'); else btn.removeAttribute('aria-current');
     });
   }
   function frame() {
